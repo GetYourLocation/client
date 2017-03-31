@@ -1,4 +1,4 @@
-package com.example.stevennl.getyourlocation;
+package com.getyourlocation.app.gyl_client;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.stevennl.getyourlocation", appContext.getPackageName());
+        assertEquals("com.getyourlocation.app.gyl_client", appContext.getPackageName());
     }
 }

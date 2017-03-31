@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">GetYourLocation</string>
+    <string name="app_name">GYL-Client</string>
+    <string name="reset">Reset</string>
+
+    <string name="sensor_data">
+        acceleration_x: %1$f\n
+        acceleration_y: %2$f\n
+        acceleration_z: %3$f\n\n
+        Gyroscope:\n
+        rotate_angle_x: %4$f\n
+        rotate_angle_y: %5$f\n
+        rotate_angle_z: %6$f\n\n
+        Compass:\n
+        rotate_angle_z: %7$f\n
+    </string>
 </resources>

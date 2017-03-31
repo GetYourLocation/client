@@ -1,4 +1,4 @@
-package com.example.stevennl.getyourlocation;
+package com.getyourlocation.app.gyl_client;
 
 import org.junit.Test;
 
