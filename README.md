@@ -1,6 +1,6 @@
-# Positioning-Client
+# GYL-Client
 
-Android client of the positioning system.
+Android client of the localization system.
 
 ## License
 
