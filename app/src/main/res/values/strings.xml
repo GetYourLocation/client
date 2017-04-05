@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">GYL-Client</string>
-    <string name="reset">Reset</string>
-
+    <string name="reset_sensor">Reset sensor</string>
+    <string name="test">Test</string>
     <string name="sensor_data">
         acceleration_x: %1$f\n
         acceleration_y: %2$f\n
