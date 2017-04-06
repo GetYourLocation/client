@@ -45,6 +45,22 @@
                 android:text="Product"
                 android:id="@+id/test_productBtn"/>
         </LinearLayout>
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/test_imgBtn"
+            android:background="#00000000"
+            android:src="@drawable/circle"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload"
+            android:id="@+id/test_uploadBtn"/>
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/test_resultImgView"
+            android:background="#00000000"/>
     </LinearLayout>
 </ScrollView>
 
