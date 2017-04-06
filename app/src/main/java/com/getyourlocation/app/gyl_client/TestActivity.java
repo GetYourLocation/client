@@ -18,8 +18,6 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.cache.DiskLruBasedCache;
-import com.android.volley.cache.SimpleImageLoader;
 import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.SimpleMultiPartRequest;
@@ -39,7 +37,7 @@ import java.util.Map;
 public class TestActivity extends AppCompatActivity {
     private static final String TAG = "TestActivity";
 
-    private static final String SERVER_IP = "http://192.168.199.105";
+    private static final String SERVER_IP = "http://120.25.76.106";
     private static final String URL_SUM = SERVER_IP + "/gyl/api/sum";
     private static final String URL_PRODUCT = SERVER_IP + "/gyl/api/product";
     private static final String URL_UPLOAD = SERVER_IP + "/gyl/api/upload";
@@ -56,6 +54,7 @@ public class TestActivity extends AppCompatActivity {
     private ImageView resultImgView;
 
     private String imgFilename;
+    private boolean permitUpload = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,11 +233,15 @@ public class TestActivity extends AppCompatActivity {
         uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                resultImgView.setImageBitmap(null);
+                if (!permitUpload) {
+                    CommonUtil.showToast(TestActivity.this, "Restart this activity to upload the next image!");
+                    return;
+                }
                 if (imgFilename == null || imgFilename.isEmpty()) {
                     CommonUtil.showToast(TestActivity.this, "Click the circle to select an image first!");
                     return;
                 }
+                permitUpload = false;
                 SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, URL_UPLOAD,
                     new Response.Listener<String>() {
                         @Override
