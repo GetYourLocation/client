@@ -1,23 +1,35 @@
 package com.getyourlocation.app.gyl_client;
 
+import android.content.CursorLoader;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.cache.DiskLruBasedCache;
+import com.android.volley.cache.SimpleImageLoader;
 import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
+import com.android.volley.request.SimpleMultiPartRequest;
 import com.android.volley.request.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.android.volley.toolbox.ImageLoader;
 import com.getyourlocation.app.gyl_client.util.CommonUtil;
+import com.getyourlocation.app.gyl_client.util.NetworkUtil;
 import com.getyourlocation.app.gyl_client.util.SensorUtil;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -30,21 +42,31 @@ public class TestActivity extends AppCompatActivity {
     private static final String SERVER_IP = "http://192.168.199.105";
     private static final String URL_SUM = SERVER_IP + "/gyl/api/sum";
     private static final String URL_PRODUCT = SERVER_IP + "/gyl/api/product";
+    private static final String URL_UPLOAD = SERVER_IP + "/gyl/api/upload";
+
+    private static final int REQ_PICK_IMG = 1;
 
     private SensorUtil sensorUtil;
-    private RequestQueue requestQueue;
+    private NetworkUtil networkUtil;
 
     private TextView sensorInfoTxt;
     private EditText xValTxt;
     private EditText yValTxt;
+    private ImageButton imgBtn;
+    private ImageView resultImgView;
+
+    private String imgFilename;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        initReqQueue();
+        initNetwork();
         initSensor();
         initSumProduct();
+        initImgBtn();
+        initResultImgView();
+        initUploadBtn();
     }
 
     @Override
@@ -59,8 +81,8 @@ public class TestActivity extends AppCompatActivity {
         sensorUtil.unregister();
     }
 
-    private void initReqQueue() {
-        requestQueue = Volley.newRequestQueue(getApplicationContext());
+    private void initNetwork() {
+        networkUtil = NetworkUtil.getInstance(this);
     }
 
     private void initSensor() {
@@ -115,9 +137,9 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void computeSum(final int x, final int y) {
-        requestQueue.add(new StringRequest(Request.Method.GET, URL_SUM, new Response.Listener<String>() {
+        StringRequest req = new StringRequest(Request.Method.GET, URL_SUM, new Response.Listener<String>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(String response) {  // Called when server respond
                 Log.d(TAG, response);
                 try {
                     JSONObject jsonObj = new JSONObject(response);
@@ -139,35 +161,123 @@ public class TestActivity extends AppCompatActivity {
                 params.put("x", String.valueOf(x));
                 params.put("y", String.valueOf(y));
                 return params;
+            }
+        };
+        networkUtil.addReq(req);
+    }
+
+    private void computeProduct(final int x, final int y) {
+        StringRequest req = new StringRequest(Request.Method.POST, URL_PRODUCT, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {  // Called when server respond
+                Log.d(TAG, response);
+                try {
+                    JSONObject jsonObj = new JSONObject(response);
+                    int ans = (int)jsonObj.get("ans");
+                    CommonUtil.showToast(TestActivity.this, String.valueOf(ans));
+                } catch (Exception e) {
+                    Log.e(TAG, "", e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "", error);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("x", String.valueOf(x));
+                params.put("y", String.valueOf(y));
+                return params;
+            }
+        };
+        networkUtil.addReq(req);
+    }
+
+    private void initImgBtn() {
+        imgBtn = (ImageButton) findViewById(R.id.test_imgBtn);
+        imgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, REQ_PICK_IMG);
             }
         });
     }
 
-    private void computeProduct(final int x, final int y) {
-        requestQueue.add(new StringRequest(Request.Method.POST, URL_PRODUCT, new Response.Listener<String>() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_PICK_IMG && resultCode == RESULT_OK) {
+            Uri imgUri = data.getData();
+            Log.d(TAG, "imgUri: " + imgUri.toString());
+            String[] proj = { MediaStore.Images.Media.DATA };
+            CursorLoader loader = new CursorLoader(getApplicationContext(), imgUri, proj, null, null, null);
+            Cursor cursor = loader.loadInBackground();
+            int colIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            imgFilename = cursor.getString(colIndex);
+            cursor.close();
+            Log.d(TAG, "imgFilename: " + imgFilename);
+            imgBtn.setImageURI(imgUri);
+        }
+    }
+
+    private void initResultImgView() {
+        resultImgView = (ImageView) findViewById(R.id.test_resultImgView);
+    }
+
+    private void initUploadBtn() {
+        Button uploadBtn = (Button) findViewById(R.id.test_uploadBtn);
+        uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(String response) {
-                Log.d(TAG, response);
-                try {
-                    JSONObject jsonObj = new JSONObject(response);
-                    int ans = (int)jsonObj.get("ans");
-                    CommonUtil.showToast(TestActivity.this, String.valueOf(ans));
-                } catch (Exception e) {
-                    Log.e(TAG, "", e);
+            public void onClick(View v) {
+                resultImgView.setImageBitmap(null);
+                if (imgFilename == null || imgFilename.isEmpty()) {
+                    CommonUtil.showToast(TestActivity.this, "Click the circle to select an image first!");
+                    return;
                 }
+                SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, URL_UPLOAD,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d(TAG, response);
+                            CommonUtil.showToast(TestActivity.this, "Upload succeed!");
+                            try {
+                                JSONArray jsonArr = new JSONArray(response);
+                                String uri = (String)jsonArr.get(0);
+                                showUploadedImg(SERVER_IP + uri);
+                            } catch (Exception e) {
+                                Log.e(TAG, "", e);
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.e(TAG, "", error);
+                            CommonUtil.showToast(TestActivity.this, "Upload failed! Code:" + error.networkResponse.statusCode);
+                        }
+                    });
+                req.addFile("file", imgFilename);
+                req.addMultipartParam("ext", "text/plain", imgFilename.substring(imgFilename.indexOf(".") + 1));
+                networkUtil.addReq(req);
             }
-        }, new Response.ErrorListener() {
+        });
+    }
+
+    private void showUploadedImg(String imgURI) {
+        networkUtil.fetchImage(imgURI, new ImageLoader.ImageListener() {
+            @Override
+            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+                Bitmap bitmap = response.getBitmap();
+                resultImgView.setImageBitmap(bitmap);
+            }
+
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "", error);
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("x", String.valueOf(x));
-                params.put("y", String.valueOf(y));
-                return params;
             }
         });
     }
