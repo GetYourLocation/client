@@ -4,10 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.getyourlocation.app.gyl_client.MainActivity">
-    <Button
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/main_btn"
-        android:text="TEST"
-        android:layout_centerInParent="true"/>
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/main_test_btn"
+            android:text="TEST"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/main_map_btn"
+            android:text="MAP"/>
+    </LinearLayout>
 </RelativeLayout>
