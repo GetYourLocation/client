@@ -1,4 +1,4 @@
-package com.getyourlocation.app.gyl_client;
+package com.getyourlocation.app.gyl_client.activity;
 
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -23,6 +23,7 @@ import com.android.volley.error.VolleyError;
 import com.android.volley.request.SimpleMultiPartRequest;
 import com.android.volley.request.StringRequest;
 import com.android.volley.toolbox.ImageLoader;
+import com.getyourlocation.app.gyl_client.R;
 import com.getyourlocation.app.gyl_client.util.CommonUtil;
 import com.getyourlocation.app.gyl_client.util.NetworkUtil;
 import com.getyourlocation.app.gyl_client.util.SensorUtil;
