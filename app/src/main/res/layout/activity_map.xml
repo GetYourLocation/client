@@ -11,32 +11,37 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/map_view_container">
+        android:id="@+id/map_viewContainer">
     </RelativeLayout>
-    <Button
-        android:id="@+id/up_botton"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:text="Upper Floor"
-        android:layout_alignStart="@+id/low_botton" />
-    <Button
-        android:id="@+id/low_botton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/up_botton"
-        android:text="Lower Floor" />
-    <TextView
-        android:id="@+id/floor_text"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignStart="@+id/low_botton"
-        android:layout_below="@+id/low_botton"
-        android:lineSpacingExtra="10sp"
-        android:text="Floor:1"
-        android:textAlignment="center"
-        android:textSize="18sp" />
+        android:layout_alignParentTop="true">
+        <Button
+            android:id="@+id/map_clearBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="Clear" />
+        <Button
+            android:id="@+id/map_upBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="Upper" />
+        <Button
+            android:id="@+id/map_lowBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="Lower" />
+        <TextView
+            android:id="@+id/map_floorTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Floor: 1"/>
+    </LinearLayout>
 </RelativeLayout>

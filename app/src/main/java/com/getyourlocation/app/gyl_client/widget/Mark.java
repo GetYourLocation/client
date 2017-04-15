@@ -1,4 +1,4 @@
-package com.getyourlocation.app.gyl_client;
+package com.getyourlocation.app.gyl_client.widget;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -8,13 +8,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.getyourlocation.app.gyl_client.R;
 import com.palmaplus.nagrand.view.overlay.OverlayCell;
+
 
 /**
  * Created by lchad on 2016/11/1.
  * Github: https://github.com/lchad
  */
-
 public class Mark extends LinearLayout implements OverlayCell {
     private ImageView mIconView;
     private TextView mPosX;

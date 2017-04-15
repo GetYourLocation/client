@@ -9,7 +9,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.getyourlocation.app.gyl_client.Constant;
-import com.getyourlocation.app.gyl_client.Mark;
+import com.getyourlocation.app.gyl_client.util.CommonUtil;
+import com.getyourlocation.app.gyl_client.widget.Mark;
 import com.getyourlocation.app.gyl_client.R;
 import com.palmaplus.nagrand.core.Types;
 import com.palmaplus.nagrand.data.DataList;
@@ -34,23 +35,17 @@ public class MapActivity extends AppCompatActivity {
     private MapView mapView;
     private TextView floorTxt;
 
-    private int floorIndex = 0;
+    private ArrayList<Mark> marks = new ArrayList<>();
+    private int curFloorIdx = 0;
+    private long curFloorID = 0;
 
-    // Mark container layer layout
-    private RelativeLayout overlay_container;
-    private ArrayList<Mark> mark_list;
-    private int markNum = 0;
-    private long currentFloorId=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        initDataSource();
+        initFloorCtrl();
         initMap();
-        initOverlayContainer();
-        initSingleTaptoMark();
-        initFloorTxt();
-        initFloorBtn();
+        initClearBtn();
     }
 
     @Override
@@ -58,35 +53,49 @@ public class MapActivity extends AppCompatActivity {
         super.onDestroy();
         mapView.drop();
     }
-    private  void initSingleTaptoMark(){
 
-        mapView.setOnSingleTapListener(new OnSingleTapListener() {
+    private void initFloorCtrl() {
+        floorTxt = (TextView) findViewById(R.id.map_floorTxt);
+        Button upBtn = (Button) findViewById(R.id.map_upBtn);
+        upBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSingleTap(MapView mapView, float x, float y) {
-                Types.Point point = mapView.converToWorldCoordinate(x, y);
-                Mark mark = new Mark(mapView.getContext());
-                mark.setMark(++markNum, x, y);
-                mark.init(new double[]{point.x, point.y});
-                mark.setFloorId(currentFloorId);
-                Log.d("MapActivity","x:"+x+"y"+y);
-                mapView.addOverlay(mark);
-                mark_list.add(mark);
+            public void onClick(View v) {
+                removeAllMark();
+                if (floorList != null && curFloorIdx < floorList.getSize() - 1) {
+                    curFloorIdx++;
+                    Log.d(TAG, "Floor: " + String.valueOf(curFloorIdx));
+                    showFloor(LocationModel.id.get(floorList.getPOI(curFloorIdx)));
+                }
+                floorTxt.setText(String.format(Locale.CHINA, "Floor: %d", curFloorIdx + 1));
+            }
+        });
+        Button lowBtn = (Button) findViewById(R.id.map_lowBtn);
+        lowBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeAllMark();
+                if (floorList != null && curFloorIdx > 0) {
+                    curFloorIdx--;
+                    Log.d(TAG, "Floor: " + String.valueOf(curFloorIdx));
+                    showFloor(LocationModel.id.get(floorList.getPOI(curFloorIdx)));
+                }
+                floorTxt.setText(String.format(Locale.CHINA, "Floor: %d", curFloorIdx + 1));
             }
         });
     }
-    private void initDataSource() {
-        dataSource = new DataSource(Constant.URL_SERVER);
-    }
-    private void initOverlayContainer(){
-        overlay_container=(RelativeLayout)findViewById(R.id.map_view_container);
-        setOverlay_container();
-        mark_list = new ArrayList<Mark>();
-    }
-    private void setOverlay_container(){
-        mapView.setOverlayContainer(overlay_container);
-    }
+
     private void initMap() {
+        dataSource = new DataSource(Constant.URL_SERVER);
+        RelativeLayout container = (RelativeLayout) findViewById(R.id.map_viewContainer);
         mapView = (MapView) findViewById(R.id.map_mapView);
+        mapView.setOverlayContainer(container);
+        mapView.setOnSingleTapListener(new OnSingleTapListener() {
+            @Override
+            public void onSingleTap(MapView mapView, float x, float y) {
+                CommonUtil.showToast(MapActivity.this, "X: " + x + " Y: " + y);
+                addMark(mapView, x, y);
+            }
+        });
         // 请求可用地图
         dataSource.requestMaps(new DataSource.OnRequestDataEventListener<DataList<MapModel>>() {
             @Override
@@ -104,34 +113,12 @@ public class MapActivity extends AppCompatActivity {
         });
     }
 
-    private void initFloorTxt() {
-        floorTxt = (TextView) findViewById(R.id.floor_text);
-    }
-
-    private void initFloorBtn() {
-        Button upBtn = (Button) findViewById(R.id.up_botton);
-        upBtn.setOnClickListener(new View.OnClickListener() {
+    private void initClearBtn() {
+        Button clrBtn = (Button) findViewById(R.id.map_clearBtn);
+        clrBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (floorList != null && floorIndex < floorList.getSize() - 1) {
-                    floorIndex++;
-                    Log.d(TAG, "Floor: " + String.valueOf(floorIndex));
-                    showFloor(LocationModel.id.get(floorList.getPOI(floorIndex)));
-                }
-                floorTxt.setText(String.format(Locale.CHINA, "Floor: %d", floorIndex + 1));
-            }
-        });
-
-        Button lowBtn = (Button) findViewById(R.id.low_botton);
-        lowBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (floorList != null && floorIndex > 0) {
-                    floorIndex--;
-                    Log.d(TAG, "Floor: " + String.valueOf(floorIndex));
-                    showFloor(LocationModel.id.get(floorList.getPOI(floorIndex)));
-                }
-                floorTxt.setText(String.format(Locale.CHINA, "Floor: %d", floorIndex + 1));
+                removeAllMark();
             }
         });
     }
@@ -154,13 +141,12 @@ public class MapActivity extends AppCompatActivity {
         });
     }
 
-    private void showFloor(long floorID) {
-        // get FloorId to Add Mark in correspond Floor
-        currentFloorId = floorID;
+    private void showFloor(final long floorID) {
         dataSource.requestPlanarGraph(floorID, new DataSource.OnRequestDataEventListener<PlanarGraph>() {
             @Override
             public void onRequestDataEvent(DataSource.ResourceState state, PlanarGraph data) {
                 if (state == DataSource.ResourceState.ok) {
+                    curFloorID = floorID;
                     mapView.drawPlanarGraph(data);
                     mapView.start();  // 开始绘制楼层平面图
                 } else {
@@ -169,33 +155,19 @@ public class MapActivity extends AppCompatActivity {
             }
         });
     }
-    public void AddMark(MapView mapView, float x, float y) {
-        //将屏幕坐标转换为事件坐标
-        Types.Point point = mapView.converToWorldCoordinate(x, y);
-        //创建一个覆盖物
-        Mark mark = new Mark(getApplicationContext());
-        mark.setMark(++markNum, x, y);
-        //把世界坐标传递给它
-        mark.init(new double[]{point.x, point.y});
-        //将这个覆盖物添加到MapView中
-        mark.setFloorId(currentFloorId);
-        mark_list.add(mark);
-        mapView.addOverlay(mark);
-    }
-    public void RemoveMark(MapView mapView, long Id){
-        for (Mark m:mark_list
-                ) {
-            if (m.getId() == Id) {
-                mapView.removeOverlay(m);
-                mark_list.remove(m);
-                markNum--;
-            }
 
-        }
+    private void addMark(MapView mapView, float x, float y) {
+        Types.Point point = mapView.converToWorldCoordinate(x, y);
+        Mark mark = new Mark(mapView.getContext());
+        mark.setMark(marks.size(), x, y);
+        mark.init(new double[]{point.x, point.y});
+        mark.setFloorId(curFloorID);
+        mapView.addOverlay(mark);
+        marks.add(mark);
     }
-    public void RemoveAllMark(MapView mapView){
+
+    private void removeAllMark() {
         mapView.removeAllOverlay();
-        mark_list.clear();
-        markNum =0;
+        marks.clear();
     }
 }
