@@ -3,10 +3,12 @@ package com.getyourlocation.app.gyl_client.activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.getyourlocation.app.gyl_client.Constant;
 import com.getyourlocation.app.gyl_client.R;
-import com.getyourlocation.app.gyl_client.util.FileUtil;
 import com.palmaplus.nagrand.data.DataList;
 import com.palmaplus.nagrand.data.DataSource;
 import com.palmaplus.nagrand.data.LocationList;
@@ -15,12 +17,19 @@ import com.palmaplus.nagrand.data.MapModel;
 import com.palmaplus.nagrand.data.PlanarGraph;
 import com.palmaplus.nagrand.view.MapView;
 
+import java.util.Locale;
+
 
 public class MapActivity extends AppCompatActivity {
     private static final String TAG = "MapActivity";
 
-    private MapView mapView;
     private DataSource dataSource;
+    private LocationList floorList;
+
+    private MapView mapView;
+    private TextView floorTxt;
+
+    private int floorIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +37,8 @@ public class MapActivity extends AppCompatActivity {
         setContentView(R.layout.activity_map);
         initDataSource();
         initMap();
+        initFloorTxt();
+        initFloorBtn();
     }
 
     @Override
@@ -59,14 +70,47 @@ public class MapActivity extends AppCompatActivity {
         });
     }
 
+    private void initFloorTxt() {
+        floorTxt = (TextView) findViewById(R.id.floor_text);
+    }
+
+    private void initFloorBtn() {
+        Button upBtn = (Button) findViewById(R.id.up_botton);
+        upBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (floorList != null && floorIndex < floorList.getSize() - 1) {
+                    floorIndex++;
+                    Log.d(TAG, "Floor: " + String.valueOf(floorIndex));
+                    showFloor(LocationModel.id.get(floorList.getPOI(floorIndex)));
+                }
+                floorTxt.setText(String.format(Locale.CHINA, "Floor: %d", floorIndex + 1));
+            }
+        });
+
+        Button lowBtn = (Button) findViewById(R.id.low_botton);
+        lowBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (floorList != null && floorIndex > 0) {
+                    floorIndex--;
+                    Log.d(TAG, "Floor: " + String.valueOf(floorIndex));
+                    showFloor(LocationModel.id.get(floorList.getPOI(floorIndex)));
+                }
+                floorTxt.setText(String.format(Locale.CHINA, "Floor: %d", floorIndex + 1));
+            }
+        });
+    }
+
     private void showMap(long mapPOI) {
         dataSource.requestPOIChildren(mapPOI, new DataSource.OnRequestDataEventListener<LocationList>() {
             @Override
             public void onRequestDataEvent(DataSource.ResourceState state, LocationList data) {
                 if (state == DataSource.ResourceState.ok) {
                     Log.d(TAG, "Floor amount: " + data.getSize());
-                    if (data.getSize() != 0) {
-                        long floorID = LocationModel.id.get(data.getPOI(0));  // 得到默认楼层(1楼)ID
+                    floorList = data;
+                    if (floorList.getSize() != 0) {
+                        long floorID = LocationModel.id.get(floorList.getPOI(0));  // 得到默认楼层(1楼)ID
                         showFloor(floorID);
                     }
                 } else {

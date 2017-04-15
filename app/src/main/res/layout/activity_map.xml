@@ -8,4 +8,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/map_mapView"/>
+    <Button
+        android:id="@+id/up_botton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:text="Upper Floor"
+        android:layout_alignStart="@+id/low_botton" />
+    <Button
+        android:id="@+id/low_botton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/up_botton"
+        android:text="Lower Floor" />
+    <TextView
+        android:id="@+id/floor_text"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignStart="@+id/low_botton"
+        android:layout_below="@+id/low_botton"
+        android:lineSpacingExtra="10sp"
+        android:text="Floor:1"
+        android:textAlignment="center"
+        android:textSize="18sp" />
 </RelativeLayout>
