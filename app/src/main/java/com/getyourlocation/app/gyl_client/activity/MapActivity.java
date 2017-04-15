@@ -19,6 +19,7 @@ import com.palmaplus.nagrand.data.LocationModel;
 import com.palmaplus.nagrand.data.MapModel;
 import com.palmaplus.nagrand.data.PlanarGraph;
 import com.palmaplus.nagrand.view.MapView;
+import com.palmaplus.nagrand.view.gestures.OnSingleTapListener;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -47,6 +48,7 @@ public class MapActivity extends AppCompatActivity {
         initDataSource();
         initMap();
         initOverlayContainer();
+        initSingleTaptoMark();
         initFloorTxt();
         initFloorBtn();
     }
@@ -56,13 +58,29 @@ public class MapActivity extends AppCompatActivity {
         super.onDestroy();
         mapView.drop();
     }
+    private  void initSingleTaptoMark(){
 
+        mapView.setOnSingleTapListener(new OnSingleTapListener() {
+            @Override
+            public void onSingleTap(MapView mapView, float x, float y) {
+                Types.Point point = mapView.converToWorldCoordinate(x, y);
+                Mark mark = new Mark(mapView.getContext());
+                mark.setMark(++markNum, x, y);
+                mark.init(new double[]{point.x, point.y});
+                mark.setFloorId(currentFloorId);
+                Log.d("MapActivity","x:"+x+"y"+y);
+                mapView.addOverlay(mark);
+                mark_list.add(mark);
+            }
+        });
+    }
     private void initDataSource() {
         dataSource = new DataSource(Constant.URL_SERVER);
     }
     private void initOverlayContainer(){
         overlay_container=(RelativeLayout)findViewById(R.id.map_view_container);
         setOverlay_container();
+        mark_list = new ArrayList<Mark>();
     }
     private void setOverlay_container(){
         mapView.setOverlayContainer(overlay_container);
