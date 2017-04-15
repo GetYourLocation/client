@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.getyourlocation.app.gyl_client.Constant;
+import com.getyourlocation.app.gyl_client.Mark;
 import com.getyourlocation.app.gyl_client.R;
+import com.palmaplus.nagrand.core.Types;
 import com.palmaplus.nagrand.data.DataList;
 import com.palmaplus.nagrand.data.DataSource;
 import com.palmaplus.nagrand.data.LocationList;
@@ -17,6 +20,7 @@ import com.palmaplus.nagrand.data.MapModel;
 import com.palmaplus.nagrand.data.PlanarGraph;
 import com.palmaplus.nagrand.view.MapView;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 
@@ -31,12 +35,18 @@ public class MapActivity extends AppCompatActivity {
 
     private int floorIndex = 0;
 
+    // Mark container layer layout
+    private RelativeLayout overlay_container;
+    private ArrayList<Mark> mark_list;
+    private int markNum = 0;
+    private long currentFloorId=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         initDataSource();
         initMap();
+        initOverlayContainer();
         initFloorTxt();
         initFloorBtn();
     }
@@ -50,7 +60,13 @@ public class MapActivity extends AppCompatActivity {
     private void initDataSource() {
         dataSource = new DataSource(Constant.URL_SERVER);
     }
-
+    private void initOverlayContainer(){
+        overlay_container=(RelativeLayout)findViewById(R.id.map_view_container);
+        setOverlay_container();
+    }
+    private void setOverlay_container(){
+        mapView.setOverlayContainer(overlay_container);
+    }
     private void initMap() {
         mapView = (MapView) findViewById(R.id.map_mapView);
         // 请求可用地图
@@ -121,6 +137,8 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void showFloor(long floorID) {
+        // get FloorId to Add Mark in correspond Floor
+        currentFloorId = floorID;
         dataSource.requestPlanarGraph(floorID, new DataSource.OnRequestDataEventListener<PlanarGraph>() {
             @Override
             public void onRequestDataEvent(DataSource.ResourceState state, PlanarGraph data) {
@@ -132,5 +150,34 @@ public class MapActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+    public void AddMark(MapView mapView, float x, float y) {
+        //将屏幕坐标转换为事件坐标
+        Types.Point point = mapView.converToWorldCoordinate(x, y);
+        //创建一个覆盖物
+        Mark mark = new Mark(getApplicationContext());
+        mark.setMark(++markNum, x, y);
+        //把世界坐标传递给它
+        mark.init(new double[]{point.x, point.y});
+        //将这个覆盖物添加到MapView中
+        mark.setFloorId(currentFloorId);
+        mark_list.add(mark);
+        mapView.addOverlay(mark);
+    }
+    public void RemoveMark(MapView mapView, long Id){
+        for (Mark m:mark_list
+                ) {
+            if (m.getId() == Id) {
+                mapView.removeOverlay(m);
+                mark_list.remove(m);
+                markNum--;
+            }
+
+        }
+    }
+    public void RemoveAllMark(MapView mapView){
+        mapView.removeAllOverlay();
+        mark_list.clear();
+        markNum =0;
     }
 }
