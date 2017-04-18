@@ -10,7 +10,7 @@ import com.getyourlocation.app.gyl_client.R;
 
 public class HomeActivity extends AppCompatActivity {
 
-    @Override
+    @Override//
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
