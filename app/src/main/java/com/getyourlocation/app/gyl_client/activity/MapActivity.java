@@ -85,7 +85,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void initMap() {
-        dataSource = new DataSource(Constant.URL_SERVER);
+        dataSource = new DataSource(Constant.URL_MAP_SERVER);
         RelativeLayout container = (RelativeLayout) findViewById(R.id.map_viewContainer);
         mapView = (MapView) findViewById(R.id.map_mapView);
         mapView.setOverlayContainer(container);
