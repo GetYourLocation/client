@@ -1,4 +1,4 @@
-package com.getyourlocation.app.gyl_client.widget;
+package com.getyourlocation.app.gylclient.widget;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.getyourlocation.app.gyl_client.R;
+import com.getyourlocation.app.gylclient.R;
 import com.palmaplus.nagrand.view.overlay.OverlayCell;
 
 

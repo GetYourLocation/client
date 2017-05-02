@@ -1,11 +1,11 @@
-package com.getyourlocation.app.gyl_client.util;
+package com.getyourlocation.app.gylclient.util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.util.Log;
 
-import com.getyourlocation.app.gyl_client.Constant;
+import com.getyourlocation.app.gylclient.Constant;
 
 import java.io.File;
 import java.io.FileOutputStream;

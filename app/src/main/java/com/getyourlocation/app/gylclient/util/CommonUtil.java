@@ -1,4 +1,4 @@
-package com.getyourlocation.app.gyl_client.util;
+package com.getyourlocation.app.gylclient.util;
 
 import android.content.Context;
 import android.widget.Toast;

@@ -1,9 +1,8 @@
-package com.getyourlocation.app.gyl_client;
+package com.getyourlocation.app.gylclient;
 
 import android.app.Application;
-import android.util.Log;
 
-import com.getyourlocation.app.gyl_client.util.FileUtil;
+import com.getyourlocation.app.gylclient.util.FileUtil;
 import com.palmaplus.nagrand.core.Engine;
 
 

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/def_margin"
-    tools:context="com.getyourlocation.app.gyl_client.activity.TestActivity">
+    tools:context="com.getyourlocation.app.gylclient.activity.TestActivity">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
