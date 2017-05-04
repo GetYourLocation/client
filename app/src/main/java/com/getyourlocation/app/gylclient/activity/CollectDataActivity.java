@@ -32,8 +32,9 @@ public class CollectDataActivity extends AppCompatActivity {
 
     private SensorUtil sensorUtil;
 
-    private File mediaStorageDir;
     private Camera camera;
+    private Camera.PreviewCallback previewCallback;
+    private File mediaStorageDir;
     private MediaRecorder mediaRecorder;
 
     private Handler handler;
@@ -66,15 +67,8 @@ public class CollectDataActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         sensorUtil.unregister();
-        releaseCamera();
         releaseMediaRecorder();
-    }
-
-    private void releaseCamera(){
-        if (camera != null){
-            camera.release();
-            camera = null;
-        }
+        releaseCamera();
     }
 
     private void releaseMediaRecorder(){
@@ -83,6 +77,13 @@ public class CollectDataActivity extends AppCompatActivity {
             mediaRecorder.release();
             mediaRecorder = null;
             camera.lock();
+        }
+    }
+
+    private void releaseCamera(){
+        if (camera != null){
+            camera.release();
+            camera = null;
         }
     }
 
@@ -115,7 +116,13 @@ public class CollectDataActivity extends AppCompatActivity {
     private void initCamera() {
         try {
             camera = Camera.open();
-            cameraPreview = new CameraPreview(this, camera);
+            previewCallback = new Camera.PreviewCallback() {
+                @Override
+                public void onPreviewFrame(byte[] data, Camera camera) {
+                    Log.d(TAG, "onPreviewFrame() called");
+                }
+            };
+            cameraPreview = new CameraPreview(this, camera, previewCallback);
             FrameLayout layout = (FrameLayout) findViewById(R.id.data_preview_layout);
             layout.addView(cameraPreview);
             // Set maximum fps
@@ -149,6 +156,7 @@ public class CollectDataActivity extends AppCompatActivity {
                     mediaRecorder.stop();
                     releaseMediaRecorder();
                     camera.lock();
+                    camera.setPreviewCallback(previewCallback);
                     recordBtn.setText("Start");
                     isRecording = false;
                     infoTxt.setText("Video saved at " + curFilename);
