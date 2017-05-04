@@ -37,6 +37,7 @@ public class CollectDataActivity extends AppCompatActivity {
     private Camera camera;
     private MediaRecorder mediaRecorder;
 
+    private int maxFPS = 60;
     private boolean isRecording = false;
 
     @Override
@@ -107,6 +108,11 @@ public class CollectDataActivity extends AppCompatActivity {
             cameraPreview = new CameraPreview(this, camera);
             FrameLayout layout = (FrameLayout) findViewById(R.id.data_preview_layout);
             layout.addView(cameraPreview);
+            // Set maximum fps
+            int fpsRange[] = new int[2];
+            camera.getParameters().getPreviewFpsRange(fpsRange);
+            maxFPS = fpsRange[1] / 1000;
+            Log.d(TAG, "FPS: " + maxFPS);
         } catch (Exception e){
             Log.e(TAG, "", e);
         }
@@ -137,16 +143,16 @@ public class CollectDataActivity extends AppCompatActivity {
         });
     }
 
-    private boolean prepareVideoRecorder(){
-        mediaRecorder = new MediaRecorder();
+    private boolean prepareVideoRecorder() {
         camera.unlock();
+        mediaRecorder = new MediaRecorder();
         mediaRecorder.setCamera(camera);
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_1080P));
-        mediaRecorder.setOutputFile(getOutputMediaFilePath());
+        mediaRecorder.setCaptureRate(maxFPS);
         mediaRecorder.setPreviewDisplay(cameraPreview.getHolder().getSurface());
-        mediaRecorder.setCaptureRate(30);
+        mediaRecorder.setOutputFile(mediaStorageDir.getPath() + File.separator + CommonUtil.getTimestamp() + ".mp4");
         try {
             mediaRecorder.prepare();
         } catch (IllegalStateException e) {
@@ -159,11 +165,5 @@ public class CollectDataActivity extends AppCompatActivity {
             return false;
         }
         return true;
-    }
-
-    public String getOutputMediaFilePath() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
-        String timeStamp = dateFormat.format(new Date());
-        return mediaStorageDir.getPath() + File.separator + timeStamp + ".mp4";
     }
 }
