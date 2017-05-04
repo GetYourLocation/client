@@ -8,20 +8,28 @@
         android:id="@+id/data_preview_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/data_infoTxt"
+        android:textColor="@color/white"/>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:textColor="@color/white"
             android:id="@+id/data_sensorTxt"/>
         <Button
-            android:id="@+id/data_capture_btn"
-            android:text="Capture"
+            android:id="@+id/data_recordBtn"
+            android:text="Record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>

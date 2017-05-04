@@ -4,6 +4,7 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,16 +20,14 @@ import com.getyourlocation.app.gylclient.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 
 public class CollectDataActivity extends AppCompatActivity {
     private static final String TAG = "CollectDataActivity";
 
-    private TextView sensorInfoTxt;
-    private Button captureBtn;
+    private TextView sensorTxt;
+    private TextView infoTxt;
+    private Button recordBtn;
     private CameraPreview cameraPreview;
 
     private SensorUtil sensorUtil;
@@ -37,17 +36,24 @@ public class CollectDataActivity extends AppCompatActivity {
     private Camera camera;
     private MediaRecorder mediaRecorder;
 
+    private Handler handler;
+    private Runnable timingRunnable;
+
     private int maxFPS = 60;
+    private int seconds = 0;
     private boolean isRecording = false;
+    private String curFilename;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collect_data);
+        initTxt();
         initSensor();
         initStorageDir();
         initCamera();
-        initCaptureBtn();
+        initTiming();
+        initRecordBtn();
     }
 
     @Override
@@ -80,14 +86,18 @@ public class CollectDataActivity extends AppCompatActivity {
         }
     }
 
+    private void initTxt() {
+        sensorTxt = (TextView) findViewById(R.id.data_sensorTxt);
+        infoTxt = (TextView) findViewById(R.id.data_infoTxt);
+    }
+
     private void initSensor() {
-        sensorInfoTxt = (TextView) findViewById(R.id.data_sensorTxt);
         sensorUtil = SensorUtil.getInstance(this);
         sensorUtil.setOnSensorUpdatedListener(new SensorUtil.OnSensorUpdatedListener() {
             @Override
             public void onUpdated() {
-                String txt = "Sensor: " + sensorUtil.getCompassRotate();
-                sensorInfoTxt.setText(txt);
+                String txt = String.valueOf(sensorUtil.getCompassRotate());
+                sensorTxt.setText(txt);
             }
         });
     }
@@ -118,21 +128,35 @@ public class CollectDataActivity extends AppCompatActivity {
         }
     }
 
-    private void initCaptureBtn() {
-        captureBtn = (Button) findViewById(R.id.data_capture_btn);
-        captureBtn.setOnClickListener(new View.OnClickListener() {
+    private void initTiming() {
+        handler = new Handler();
+        timingRunnable = new Runnable() {
+            @Override
+            public void run() {
+                recordBtn.setText(String.valueOf(seconds++));
+                handler.postDelayed(timingRunnable, 1000);
+            }
+        };
+    }
+
+    private void initRecordBtn() {
+        recordBtn = (Button) findViewById(R.id.data_recordBtn);
+        recordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isRecording) {
+                    handler.removeCallbacks(timingRunnable);
                     mediaRecorder.stop();
                     releaseMediaRecorder();
                     camera.lock();
-                    captureBtn.setText("Capture");
+                    recordBtn.setText("Start");
                     isRecording = false;
+                    infoTxt.setText("Video saved at " + curFilename);
                 } else {
                     if (prepareVideoRecorder()) {
                         mediaRecorder.start();
-                        captureBtn.setText("Stop");
+                        seconds = 0;
+                        handler.post(timingRunnable);
                         isRecording = true;
                     } else {
                         CommonUtil.showToast(CollectDataActivity.this, "Video recorder prepared failed");
@@ -152,7 +176,8 @@ public class CollectDataActivity extends AppCompatActivity {
         mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_1080P));
         mediaRecorder.setCaptureRate(maxFPS);
         mediaRecorder.setPreviewDisplay(cameraPreview.getHolder().getSurface());
-        mediaRecorder.setOutputFile(mediaStorageDir.getPath() + File.separator + CommonUtil.getTimestamp() + ".mp4");
+        curFilename = mediaStorageDir.getPath() + File.separator + CommonUtil.getTimestamp() + ".mp4";
+        mediaRecorder.setOutputFile(curFilename);
         try {
             mediaRecorder.prepare();
         } catch (IllegalStateException e) {
