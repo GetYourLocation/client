@@ -32,6 +32,8 @@ public class CollectDataActivity extends AppCompatActivity {
     private Button recordBtn;
 
     private Camera camera;
+    private CameraPreview cameraPreview;
+
     private File storageDir;
     private SensorUtil sensorUtil;
 
@@ -68,6 +70,7 @@ public class CollectDataActivity extends AppCompatActivity {
 
     private void releaseCamera(){
         if (camera != null){
+            camera.setPreviewCallback(null);
             camera.release();
             camera = null;
         }
@@ -101,22 +104,17 @@ public class CollectDataActivity extends AppCompatActivity {
     }
 
     private void initCamera() {
-        try {
-            camera = Camera.open();
-            camera.setPreviewCallback(new Camera.PreviewCallback() {
-                @Override
-                public void onPreviewFrame(byte[] data, Camera camera) {
-                    if (isRecording) {
-                        storeFrame(data);
-                    }
+        camera = Camera.open();
+        cameraPreview = new CameraPreview(this, camera, new Camera.PreviewCallback() {
+            @Override
+            public void onPreviewFrame(byte[] data, Camera camera) {
+                if (isRecording) {
+                    storeFrame(data);
                 }
-            });
-            CameraPreview preview = new CameraPreview(this, camera);
-            FrameLayout layout = (FrameLayout) findViewById(R.id.data_preview_layout);
-            layout.addView(preview);
-        } catch (Exception e){
-            Log.e(TAG, "", e);
-        }
+            }
+        });
+        FrameLayout layout = (FrameLayout) findViewById(R.id.data_preview_layout);
+        layout.addView(cameraPreview);
     }
 
     private void initRecordBtn() {
@@ -140,12 +138,18 @@ public class CollectDataActivity extends AppCompatActivity {
     }
 
     private void storeFrame(byte[] raw) {
+        Camera.Size size = cameraPreview.getPreviewSize();
+        YuvImage im = new YuvImage(raw, ImageFormat.NV21, size.width, size.height, null);
+        Rect r = new Rect(0, 0, size.width, size.height);
+        ByteArrayOutputStream jpegStream = new ByteArrayOutputStream();
+        im.compressToJpeg(r, CameraPreview.JPEG_QUALITY, jpegStream);
         String filename = storageDir.getPath() + File.separator + frameCnt + ".jpg";
         File frameFile = new File(filename);
         try {
             FileOutputStream fos = new FileOutputStream(frameFile);
-            fos.write(raw);
+            fos.write(jpegStream.toByteArray());
             fos.close();
+            jpegStream.close();
             Log.d(TAG, "Frame " + frameCnt + " saved");
             ++frameCnt;
         } catch (Exception e) {

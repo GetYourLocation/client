@@ -12,18 +12,25 @@ import java.util.List;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = "CameraPreview";
+    public static final int JPEG_QUALITY = 100;
     private Camera camera;
-    private Camera.Size bestPreviewSize;
+    private Camera.Parameters cameraParams;
+    private Camera.Size previewSize;
+    private Camera.PreviewCallback previewCallback;
 
     public CameraPreview(Context context) {
-        this(context, null);
+        this(context, null, null);
     }
 
-    public CameraPreview(Context context, Camera camera) {
+    public CameraPreview(Context context, Camera camera, Camera.PreviewCallback previewCallback) {
         super(context);
         this.camera = camera;
-        SurfaceHolder holder = getHolder();
-        holder.addCallback(this);
+        this.previewCallback = previewCallback;
+        getHolder().addCallback(this);
+    }
+
+    public Camera.Size getPreviewSize() {
+        return previewSize;
     }
 
     @Override
@@ -34,7 +41,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         setMeasuredDimension(width, height);
         List<Camera.Size> supportedSizes = camera.getParameters().getSupportedPreviewSizes();
         if (supportedSizes != null) {
-            bestPreviewSize = getOptimalPreviewSize(supportedSizes, width, height);
+            previewSize = getOptimalPreviewSize(supportedSizes, width, height);
         }
     }
 
@@ -42,15 +49,17 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated() called");
         try {
-            camera.setPreviewDisplay(holder);
-            Camera.Parameters params = camera.getParameters();
-            params.setPreviewSize(bestPreviewSize.width, bestPreviewSize.height);
-            if (params.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-                params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            cameraParams = camera.getParameters();
+            cameraParams.setJpegQuality(JPEG_QUALITY);
+            cameraParams.setPreviewSize(previewSize.width, previewSize.height);
+            if (cameraParams.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                cameraParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
             } else {
-                params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+                cameraParams.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             }
-            camera.setParameters(params);
+            camera.setParameters(cameraParams);
+            camera.setPreviewCallback(previewCallback);
+            camera.setPreviewDisplay(holder);
             camera.startPreview();
         } catch (IOException e) {
             Log.e(TAG, "", e);
@@ -85,6 +94,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         // start preview with new settings
         try {
+            camera.setParameters(cameraParams);
+            camera.setPreviewCallback(previewCallback);
             camera.setPreviewDisplay(holder);
             camera.startPreview();
         } catch (Exception e){
