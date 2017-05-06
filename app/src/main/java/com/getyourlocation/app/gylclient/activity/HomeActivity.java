@@ -35,5 +35,12 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(HomeActivity.this, CollectDataActivity.class));
             }
         });
+        Button locBtn = (Button) findViewById(R.id.main_localization_btn);
+        locBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, LocalizationActivity.class));
+            }
+        });
     }
 }
