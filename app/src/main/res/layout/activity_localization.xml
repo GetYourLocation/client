@@ -4,5 +4,64 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.getyourlocation.app.gylclient.activity.LocalizationActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="X1"
+            android:id="@+id/test_x1_editTxt"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Y1"
+            android:id="@+id/test_y1_editTxt"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="X2"
+            android:id="@+id/test_x2_editTxt"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Y2"
+            android:id="@+id/test_y2_editTxt"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="X3"
+            android:id="@+id/test_x3_editTxt"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Y3"
+            android:id="@+id/test_y3_editTxt"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="alpha"
+            android:id="@+id/test_alpha_editTxt"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="beta"
+            android:id="@+id/test_beta_editTxt"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GetLocation"
+            android:id="@+id/GetLocationBtn"/>
+    </LinearLayout>
+
 
 </RelativeLayout>
