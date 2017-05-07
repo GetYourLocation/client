@@ -3,12 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.getyourlocation.app.gyl_client.activity.HomeActivity">
+    tools:context="com.getyourlocation.app.gylclient.activity.HomeActivity">
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_centerInParent="true">
+        android:layout_centerInParent="true"
+        android:gravity="center">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -19,5 +20,15 @@
             android:layout_height="wrap_content"
             android:id="@+id/main_map_btn"
             android:text="MAP"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/main_data_btn"
+            android:text="DATA"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/main_localization_btn"
+            android:text="Localization"/>
     </LinearLayout>
 </RelativeLayout>

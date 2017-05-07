@@ -1,4 +1,4 @@
-package com.getyourlocation.app.gyl_client.activity;
+package com.getyourlocation.app.gylclient.activity;
 
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -23,10 +23,11 @@ import com.android.volley.error.VolleyError;
 import com.android.volley.request.SimpleMultiPartRequest;
 import com.android.volley.request.StringRequest;
 import com.android.volley.toolbox.ImageLoader;
-import com.getyourlocation.app.gyl_client.R;
-import com.getyourlocation.app.gyl_client.util.CommonUtil;
-import com.getyourlocation.app.gyl_client.util.NetworkUtil;
-import com.getyourlocation.app.gyl_client.util.SensorUtil;
+import com.getyourlocation.app.gylclient.Constant;
+import com.getyourlocation.app.gylclient.R;
+import com.getyourlocation.app.gylclient.util.CommonUtil;
+import com.getyourlocation.app.gylclient.util.NetworkUtil;
+import com.getyourlocation.app.gylclient.util.SensorUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,11 +38,6 @@ import java.util.Map;
 
 public class TestActivity extends AppCompatActivity {
     private static final String TAG = "TestActivity";
-
-    private static final String SERVER_IP = "http://120.25.76.106";
-    private static final String URL_SUM = SERVER_IP + "/gyl/api/sum";
-    private static final String URL_PRODUCT = SERVER_IP + "/gyl/api/product";
-    private static final String URL_UPLOAD = SERVER_IP + "/gyl/api/upload";
 
     private static final int REQ_PICK_IMG = 1;
 
@@ -137,24 +133,25 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void computeSum(final int x, final int y) {
-        StringRequest req = new StringRequest(Request.Method.GET, URL_SUM, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {  // Called when server respond
-                Log.d(TAG, response);
-                try {
-                    JSONObject jsonObj = new JSONObject(response);
-                    int ans = (int)jsonObj.get("ans");
-                    CommonUtil.showToast(TestActivity.this, String.valueOf(ans));
-                } catch (Exception e) {
-                    Log.e(TAG, "", e);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "", error);
-            }
-        }) {
+        StringRequest req = new StringRequest(Request.Method.GET, Constant.URL_API_SUM,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {  // Called when server respond
+                        Log.d(TAG, response);
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            int ans = (int)jsonObj.get("ans");
+                            CommonUtil.showToast(TestActivity.this, String.valueOf(ans));
+                        } catch (Exception e) {
+                            Log.e(TAG, "", e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "", error);
+                    }
+                }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
@@ -167,24 +164,25 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void computeProduct(final int x, final int y) {
-        StringRequest req = new StringRequest(Request.Method.POST, URL_PRODUCT, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {  // Called when server respond
-                Log.d(TAG, response);
-                try {
-                    JSONObject jsonObj = new JSONObject(response);
-                    int ans = (int)jsonObj.get("ans");
-                    CommonUtil.showToast(TestActivity.this, String.valueOf(ans));
-                } catch (Exception e) {
-                    Log.e(TAG, "", e);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "", error);
-            }
-        }) {
+        StringRequest req = new StringRequest(Request.Method.POST, Constant.URL_API_PRODUCT,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {  // Called when server respond
+                        Log.d(TAG, response);
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            int ans = (int)jsonObj.get("ans");
+                            CommonUtil.showToast(TestActivity.this, String.valueOf(ans));
+                        } catch (Exception e) {
+                            Log.e(TAG, "", e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "", error);
+                    }
+                }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
@@ -243,7 +241,7 @@ public class TestActivity extends AppCompatActivity {
                     return;
                 }
                 permitUpload = false;
-                SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, URL_UPLOAD,
+                SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, Constant.URL_API_UPLOAD,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -252,7 +250,7 @@ public class TestActivity extends AppCompatActivity {
                             try {
                                 JSONArray jsonArr = new JSONArray(response);
                                 String uri = (String)jsonArr.get(0);
-                                showUploadedImg(SERVER_IP + uri);
+                                showUploadedImg(Constant.URL_CLOUD_SERVER + uri);
                             } catch (Exception e) {
                                 Log.e(TAG, "", e);
                             }

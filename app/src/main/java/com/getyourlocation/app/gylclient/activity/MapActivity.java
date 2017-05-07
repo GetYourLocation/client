@@ -1,4 +1,4 @@
-package com.getyourlocation.app.gyl_client.activity;
+package com.getyourlocation.app.gylclient.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,10 +8,10 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.getyourlocation.app.gyl_client.Constant;
-import com.getyourlocation.app.gyl_client.util.CommonUtil;
-import com.getyourlocation.app.gyl_client.widget.Mark;
-import com.getyourlocation.app.gyl_client.R;
+import com.getyourlocation.app.gylclient.Constant;
+import com.getyourlocation.app.gylclient.util.CommonUtil;
+import com.getyourlocation.app.gylclient.widget.Mark;
+import com.getyourlocation.app.gylclient.R;
 import com.palmaplus.nagrand.core.Types;
 import com.palmaplus.nagrand.data.DataList;
 import com.palmaplus.nagrand.data.DataSource;
@@ -85,7 +85,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void initMap() {
-        dataSource = new DataSource(Constant.URL_SERVER);
+        dataSource = new DataSource(Constant.URL_MAP_SERVER);
         RelativeLayout container = (RelativeLayout) findViewById(R.id.map_viewContainer);
         mapView = (MapView) findViewById(R.id.map_mapView);
         mapView.setOverlayContainer(container);
