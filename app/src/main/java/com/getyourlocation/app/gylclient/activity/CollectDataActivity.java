@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.getyourlocation.app.gylclient.model.SensorData;
 import com.getyourlocation.app.gylclient.util.CommonUtil;
 import com.getyourlocation.app.gylclient.util.SensorUtil;
 import com.getyourlocation.app.gylclient.widget.CameraPreview;
@@ -24,10 +25,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class CollectDataActivity extends AppCompatActivity {
     private static final String TAG = "CollectDataActivity";
+    private static final String SENSOR_FILENAME = "sensor.txt";
 
     private TextView sensorTxt;
     private TextView infoTxt;
@@ -46,7 +49,7 @@ public class CollectDataActivity extends AppCompatActivity {
     private int seconds = 0;
     private int frameCnt = 1;
 
-    private ArrayList<Float> compassData = new ArrayList<Float>();
+    private List<SensorData> sensorData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,7 @@ public class CollectDataActivity extends AppCompatActivity {
     }
 
     private void initSensor() {
+        sensorData = new ArrayList<>();
         sensorUtil = SensorUtil.getInstance(this);
         sensorUtil.setOnSensorUpdatedListener(new SensorUtil.OnSensorUpdatedListener() {
             @Override
@@ -113,9 +117,8 @@ public class CollectDataActivity extends AppCompatActivity {
             @Override
             public void onPreviewFrame(byte[] data, Camera camera) {
                 if (isRecording) {
-                    storeFrame(data);
-                    //记录该帧的罗盘数据
-                    compassData.add(Float.valueOf(sensorUtil.getCompassRotate()));
+                    saveFrameToFile(data);
+                    addSensorData();
                 }
             }
         });
@@ -133,36 +136,31 @@ public class CollectDataActivity extends AppCompatActivity {
                     frameCnt = 1;
                     handler.post(timingRunnable);
                     isRecording = true;
-                    if (!compassData.isEmpty())
-                        compassData.clear();
+                    if (!sensorData.isEmpty())
+                        sensorData.clear();
                 } else {
                     handler.removeCallbacks(timingRunnable);
                     recordBtn.setText("Start");
                     isRecording = false;
-                    infoTxt.setText("Video saved at " + storageDir.getPath());
-                    storeCompassData();
+                    saveSensorDataToFile();
+                    infoTxt.setText("Data saved to " + storageDir.getPath());
                 }
             }
         });
     }
 
-    private void storeCompassData() {
-        String filename = storageDir.getPath() + File.separator + "compassData.txt";
-        File compassDataFile = new File(filename);
-        try {
-            FileWriter fos = new FileWriter(compassDataFile);
-            for (Float f: compassData) {
-                fos.write(f.toString());
-                fos.write('\n');
-            }
-            fos.close();
-            Log.d(TAG, "compassData " + frameCnt + " saved");
-        } catch (Exception e) {
-            Log.e(TAG, "", e);
+    private boolean createStorageDir() {
+        storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "GYL-Data/" + CommonUtil.getTimestamp());
+        if (!storageDir.exists() && !storageDir.mkdirs()) {
+            CommonUtil.showToast(CollectDataActivity.this, "Failed to create storage directory");
+            return false;
+        } else {
+            return true;
         }
     }
 
-    private void storeFrame(byte[] raw) {
+    private void saveFrameToFile(byte[] raw) {
         Camera.Size size = cameraPreview.getPreviewSize();
         YuvImage im = new YuvImage(raw, ImageFormat.NV21, size.width, size.height, null);
         Rect r = new Rect(0, 0, size.width, size.height);
@@ -182,15 +180,24 @@ public class CollectDataActivity extends AppCompatActivity {
         }
     }
 
-    private boolean createStorageDir() {
-        storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "GYL-Data/" + CommonUtil.getTimestamp());
-        if (!storageDir.exists() && !storageDir.mkdirs()) {
-            CommonUtil.showToast(CollectDataActivity.this, "Failed to create storage directory");
-            return false;
-        } else {
-            return true;
-        }
+    private void addSensorData() {
+        SensorData data = new SensorData();
+        data.setCompass(sensorUtil.getCompassRotate());
+        sensorData.add(data);
     }
 
+    private void saveSensorDataToFile() {
+        String filename = storageDir.getPath() + File.separator + SENSOR_FILENAME;
+        File sensorFile = new File(filename);
+        try {
+            FileWriter fos = new FileWriter(sensorFile);
+            for (SensorData data: sensorData) {
+                fos.write(data.toString());
+                fos.write('\n');
+            }
+            fos.close();
+        } catch (Exception e) {
+            Log.e(TAG, "", e);
+        }
+    }
 }
