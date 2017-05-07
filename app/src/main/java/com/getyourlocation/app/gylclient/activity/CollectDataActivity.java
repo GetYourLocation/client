@@ -22,6 +22,7 @@ import com.getyourlocation.app.gylclient.R;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 public class CollectDataActivity extends AppCompatActivity {
@@ -158,13 +159,47 @@ public class CollectDataActivity extends AppCompatActivity {
     }
 
     private boolean createStorageDir() {
-        storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "GYL-Data/" + CommonUtil.getTimestamp());
-        if (!storageDir.exists() && !storageDir.mkdirs()) {
-            CommonUtil.showToast(CollectDataActivity.this, "Failed to create storage directory");
-            return false;
-        } else {
-            return true;
+        //判断是否存在sd卡  
+        boolean sdExist = android.os.Environment.MEDIA_MOUNTED.equals(android.os.Environment.getExternalStorageState());
+        if(!sdExist){//如果不存在,  
+            storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES), "GYL-Data/" + CommonUtil.getTimestamp());
+            if (!storageDir.exists() && !storageDir.mkdirs()) {
+                CommonUtil.showToast(CollectDataActivity.this, "Failed to create storage directory");
+                return false;
+            } else {
+                return true;
+            }
+        }
+        else {
+            String dbDir = android.os.Environment.getExternalStorageDirectory().toString();
+            String path = dbDir + "/Pictures/GYL-Data";
+            //判断目录是否存在，不存在则创建该目录  
+            storageDir = new File(path);
+            if(!storageDir.exists())
+                storageDir.mkdirs();
+
+            boolean isFileCreateSuccess = false;
+            //判断文件是否存在，不存在则创建该文件  
+            //File dbFile = new File(storageDir);
+            if(!storageDir.exists()){
+                try {
+                    isFileCreateSuccess = storageDir.createNewFile();//创建文件 
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            else
+                isFileCreateSuccess = true;
+
+            if(isFileCreateSuccess) {
+                return  true;
+            }
+
+            else
+                return false;
+
         }
     }
 
