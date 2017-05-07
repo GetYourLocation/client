@@ -22,6 +22,8 @@ import com.getyourlocation.app.gylclient.R;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.util.ArrayList;
 
 
 public class CollectDataActivity extends AppCompatActivity {
@@ -43,6 +45,8 @@ public class CollectDataActivity extends AppCompatActivity {
     private boolean isRecording = false;
     private int seconds = 0;
     private int frameCnt = 1;
+
+    private ArrayList<Float> compassData = new ArrayList<Float>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +114,8 @@ public class CollectDataActivity extends AppCompatActivity {
             public void onPreviewFrame(byte[] data, Camera camera) {
                 if (isRecording) {
                     storeFrame(data);
+                    //记录该帧的罗盘数据
+                    compassData.add(Float.valueOf(sensorUtil.getCompassRotate()));
                 }
             }
         });
@@ -127,14 +133,33 @@ public class CollectDataActivity extends AppCompatActivity {
                     frameCnt = 1;
                     handler.post(timingRunnable);
                     isRecording = true;
+                    if (!compassData.isEmpty())
+                        compassData.clear();
                 } else {
                     handler.removeCallbacks(timingRunnable);
                     recordBtn.setText("Start");
                     isRecording = false;
                     infoTxt.setText("Video saved at " + storageDir.getPath());
+                    storeCompassData();
                 }
             }
         });
+    }
+
+    private void storeCompassData() {
+        String filename = storageDir.getPath() + File.separator + "compassData.txt";
+        File compassDataFile = new File(filename);
+        try {
+            FileWriter fos = new FileWriter(compassDataFile);
+            for (Float f: compassData) {
+                fos.write(f.toString());
+                fos.write('\n');
+            }
+            fos.close();
+            Log.d(TAG, "compassData " + frameCnt + " saved");
+        } catch (Exception e) {
+            Log.e(TAG, "", e);
+        }
     }
 
     private void storeFrame(byte[] raw) {
