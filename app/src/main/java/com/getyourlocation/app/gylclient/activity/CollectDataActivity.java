@@ -19,14 +19,10 @@ import com.getyourlocation.app.gylclient.util.SensorUtil;
 import com.getyourlocation.app.gylclient.widget.CameraPreview;
 import com.getyourlocation.app.gylclient.R;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 
 
