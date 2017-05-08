@@ -182,7 +182,9 @@ public class CollectDataActivity extends AppCompatActivity {
 
     private void addSensorData() {
         SensorData data = new SensorData();
-        data.setCompass(sensorUtil.getCompassRotate());
+        data.setCompassRotate(sensorUtil.getCompassRotate());
+        data.setAcceleration(sensorUtil.getAcceleration());
+        data.setGyroRotate(sensorUtil.getGyroRotate());
         sensorData.add(data);
     }
 
@@ -193,7 +195,6 @@ public class CollectDataActivity extends AppCompatActivity {
             FileWriter fos = new FileWriter(sensorFile);
             for (SensorData data: sensorData) {
                 fos.write(data.toString());
-                fos.write('\n');
             }
             fos.close();
         } catch (Exception e) {
