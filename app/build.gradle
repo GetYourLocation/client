@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "com.getyourlocation.app.gyl_client"
+        applicationId "com.getyourlocation.app.client"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
@@ -20,12 +20,14 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
     compile 'dev.dworks.libs:volleyplus:+'
+    compile 'sysu.mobile.limk:indoormapview:0.2'
+    compile 'sysu.mobile.limk:sensorutils:0.21'
     testCompile 'junit:junit:4.12'
 }

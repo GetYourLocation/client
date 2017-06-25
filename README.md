@@ -1,10 +1,11 @@
-# GYL-Client
+# Client
 
-Android client of the localization system.
+Android client of GetYourLocation system. Download [apk](https://github.com/GetYourLocation/GYL-Client/raw/master/apk/gyl-client.apk).
 
 ## Credits
 
 - [VolleyPlus](https://github.com/DWorkS/VolleyPlus)
+- [IndoorMapView](https://github.com/WideLee/IndoorMapView)
 
 ## License
 
