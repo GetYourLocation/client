@@ -1,4 +1,4 @@
-package com.getyourlocation.app.gyl_client.util;
+package com.getyourlocation.app.client.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -9,10 +9,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.cache.DiskLruBasedCache;
 import com.android.volley.cache.SimpleImageLoader;
-import com.android.volley.error.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-import com.getyourlocation.app.gyl_client.R;
 
 
 /**

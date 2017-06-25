@@ -1,4 +1,4 @@
-package com.getyourlocation.app.gyl_client;
+package com.getyourlocation.app.client.activity;
 
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -23,9 +23,11 @@ import com.android.volley.error.VolleyError;
 import com.android.volley.request.SimpleMultiPartRequest;
 import com.android.volley.request.StringRequest;
 import com.android.volley.toolbox.ImageLoader;
-import com.getyourlocation.app.gyl_client.util.CommonUtil;
-import com.getyourlocation.app.gyl_client.util.NetworkUtil;
-import com.getyourlocation.app.gyl_client.util.SensorUtil;
+import com.getyourlocation.app.client.Constant;
+import com.getyourlocation.app.client.R;
+import com.getyourlocation.app.client.util.CommonUtil;
+import com.getyourlocation.app.client.util.NetworkUtil;
+import com.getyourlocation.app.client.util.SensorUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,14 +35,11 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import sysu.mobile.limk.sensorutils.CalibrationActivity;
 
-public class TestActivity extends AppCompatActivity {
-    private static final String TAG = "TestActivity";
 
-    private static final String SERVER_IP = "http://120.25.76.106";
-    private static final String URL_SUM = SERVER_IP + "/gyl/api/sum";
-    private static final String URL_PRODUCT = SERVER_IP + "/gyl/api/product";
-    private static final String URL_UPLOAD = SERVER_IP + "/gyl/api/upload";
+public class SensorNetworkActivity extends AppCompatActivity {
+    private static final String TAG = "SensorNetworkActivity";
 
     private static final int REQ_PICK_IMG = 1;
 
@@ -59,7 +58,7 @@ public class TestActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
+        setContentView(R.layout.activity_sensor_network);
         initNetwork();
         initSensor();
         initSumProduct();
@@ -93,21 +92,26 @@ public class TestActivity extends AppCompatActivity {
                 sensorUtil.reset();
             }
         });
+        Button calibrateBtn = (Button) findViewById(R.id.test_calibrateBtn);
+        calibrateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SensorNetworkActivity.this, CalibrationActivity.class));
+            }
+        });
         sensorUtil = SensorUtil.getInstance(this);
         sensorUtil.setOnSensorUpdatedListener(new SensorUtil.OnSensorUpdatedListener() {
             @Override
             public void onUpdated() {
-                float[] acceleration = sensorUtil.getAcceleration();
-                float[] gyroRotate = sensorUtil.getGyroRotate();
-                float compassRotate = sensorUtil.getCompassRotate();
+                float[] acceleration = sensorUtil.getLastAcceleration();
+                float[] magnetism = sensorUtil.getLastMagnetism();
+                float[] orientation = sensorUtil.getLastOrientation();
+                double gyroRotate = sensorUtil.getLastGyroRotate();
                 sensorInfoTxt.setText(getString(R.string.sensor_data,
-                        acceleration[0],
-                        acceleration[1],
-                        acceleration[2],
-                        gyroRotate[0],
-                        gyroRotate[1],
-                        gyroRotate[2],
-                        compassRotate));
+                        acceleration[0], acceleration[1], acceleration[2],
+                        magnetism[0], magnetism[1], magnetism[2],
+                        orientation[0], orientation[1], orientation[2],
+                        gyroRotate));
             }
         });
     }
@@ -136,24 +140,25 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void computeSum(final int x, final int y) {
-        StringRequest req = new StringRequest(Request.Method.GET, URL_SUM, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {  // Called when server respond
-                Log.d(TAG, response);
-                try {
-                    JSONObject jsonObj = new JSONObject(response);
-                    int ans = (int)jsonObj.get("ans");
-                    CommonUtil.showToast(TestActivity.this, String.valueOf(ans));
-                } catch (Exception e) {
-                    Log.e(TAG, "", e);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "", error);
-            }
-        }) {
+        StringRequest req = new StringRequest(Request.Method.GET, Constant.URL_API_SUM,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {  // Called when server respond
+                        Log.d(TAG, response);
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            int ans = (int)jsonObj.get("ans");
+                            CommonUtil.showToast(SensorNetworkActivity.this, String.valueOf(ans));
+                        } catch (Exception e) {
+                            Log.e(TAG, "", e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "", error);
+                    }
+                }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
@@ -166,24 +171,25 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void computeProduct(final int x, final int y) {
-        StringRequest req = new StringRequest(Request.Method.POST, URL_PRODUCT, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {  // Called when server respond
-                Log.d(TAG, response);
-                try {
-                    JSONObject jsonObj = new JSONObject(response);
-                    int ans = (int)jsonObj.get("ans");
-                    CommonUtil.showToast(TestActivity.this, String.valueOf(ans));
-                } catch (Exception e) {
-                    Log.e(TAG, "", e);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "", error);
-            }
-        }) {
+        StringRequest req = new StringRequest(Request.Method.POST, Constant.URL_API_PRODUCT,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {  // Called when server respond
+                        Log.d(TAG, response);
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            int ans = (int)jsonObj.get("ans");
+                            CommonUtil.showToast(SensorNetworkActivity.this, String.valueOf(ans));
+                        } catch (Exception e) {
+                            Log.e(TAG, "", e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "", error);
+                    }
+                }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
@@ -234,24 +240,24 @@ public class TestActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!permitUpload) {
-                    CommonUtil.showToast(TestActivity.this, "Restart this activity to upload the next image!");
+                    CommonUtil.showToast(SensorNetworkActivity.this, "Restart this activity to upload the next image!");
                     return;
                 }
                 if (imgFilename == null || imgFilename.isEmpty()) {
-                    CommonUtil.showToast(TestActivity.this, "Click the circle to select an image first!");
+                    CommonUtil.showToast(SensorNetworkActivity.this, "Click the circle to select an image first!");
                     return;
                 }
                 permitUpload = false;
-                SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, URL_UPLOAD,
+                SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, Constant.URL_API_UPLOAD,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             Log.d(TAG, response);
-                            CommonUtil.showToast(TestActivity.this, "Upload succeed!");
+                            CommonUtil.showToast(SensorNetworkActivity.this, "Upload succeed!");
                             try {
                                 JSONArray jsonArr = new JSONArray(response);
                                 String uri = (String)jsonArr.get(0);
-                                showUploadedImg(SERVER_IP + uri);
+                                showUploadedImg(Constant.URL_CLOUD_SERVER + uri);
                             } catch (Exception e) {
                                 Log.e(TAG, "", e);
                             }
@@ -260,7 +266,7 @@ public class TestActivity extends AppCompatActivity {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             Log.e(TAG, "", error);
-                            CommonUtil.showToast(TestActivity.this, "Upload failed! Code:" + error.networkResponse.statusCode);
+                            CommonUtil.showToast(SensorNetworkActivity.this, "Upload failed! Code:" + error.networkResponse.statusCode);
                         }
                     });
                 req.addFile("file", imgFilename);

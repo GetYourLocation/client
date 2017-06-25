@@ -1,14 +1,15 @@
 <resources>
     <string name="app_name">GYL-Client</string>
     <string name="sensor_data">
-        acceleration_x: %1$f\n
+        &#160;acceleration_x: %1$f\n
         acceleration_y: %2$f\n
         acceleration_z: %3$f\n\n
-        Gyroscope:\n
-        rotate_angle_x: %4$f\n
-        rotate_angle_y: %5$f\n
-        rotate_angle_z: %6$f\n\n
-        Compass:\n
-        rotate_angle_z: %7$f\n
+        magnetism_x: %4$f\n
+        magnetism_y: %5$f\n
+        magnetism_z: %6$f\n\n
+        orientation_x: %7$f\n
+        orientation_y: %8$f\n
+        orientation_z: %9$f\n\n
+        gyro_rotate: %10$f
     </string>
 </resources>

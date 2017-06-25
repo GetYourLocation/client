@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <sysu.mobile.limk.library.MapView
+        android:id="@+id/dialog_mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:debug="true"
+        app:max_scale="4"
+        app:min_scale="0.2" />
+    <TextView
+        android:id="@+id/dialog_infoTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true" />
+    <Button
+        android:id="@+id/dialog_saveBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:textAllCaps="false"
+        android:text="Save"/>
+</RelativeLayout>

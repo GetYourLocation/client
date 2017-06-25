@@ -1,4 +1,4 @@
-package com.getyourlocation.app.gyl_client;
+package com.getyourlocation.app.client;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
