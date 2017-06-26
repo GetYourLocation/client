@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GYL-Client</string>
+    <string name="app_name">Client</string>
     <string name="sensor_data">
         &#160;acceleration_x: %1$f\n
         acceleration_y: %2$f\n
