@@ -7,6 +7,7 @@ public class Constant {
     public static final String URL_API_PRODUCT = URL_CLOUD_SERVER + "/api/product";
     public static final String URL_API_UPLOAD = URL_CLOUD_SERVER + "/api/upload";
     public static final String URL_API_LOCALIZATION = URL_CLOUD_SERVER + "/api/localization";
+    public static final String URL_API_SHOPLOCATION = URL_CLOUD_SERVER + "/api/shop-location";
 
     public static final String FILENAME_MAP = "map.png";
 }

@@ -10,8 +10,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.SimpleMultiPartRequest;
+import com.getyourlocation.app.client.Constant;
 import com.getyourlocation.app.client.R;
+import com.getyourlocation.app.client.util.CommonUtil;
+import com.getyourlocation.app.client.util.NetworkUtil;
 import com.getyourlocation.app.client.widget.CameraPreview;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,12 +39,19 @@ public class PhotoActivity extends AppCompatActivity {
     private Camera camera;
     private CameraPreview cameraPreview;
     private Button captureBtn;
+    private NetworkUtil networkUtil;
+    private float [][] imgLocation = new float[3][2];
+    private boolean [] imgCapturedStatus = new boolean[3];
+    private boolean [] imgUploadStatus = new boolean[3];
+    private int imgCaptured;
+    private int imgUpload;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
         initCamera();
         initCaptureBtn();
+        initData();
     }
     @Override
     protected void onResume() {
@@ -133,5 +150,53 @@ public class PhotoActivity extends AppCompatActivity {
         }
 
         return mediaFile;
+    }
+    private void initData()
+    {
+        for (int i = 0; i < 3; i++) {
+            imgCapturedStatus[i] = false;
+            imgUploadStatus[i] = false;
+        }
+        imgCaptured = 0;
+        imgUpload = 0;
+    }
+    /** upload single image */
+    private void uploadImage(String imgFilename)
+    {
+        if (imgFilename == null || imgFilename.isEmpty()) {
+            CommonUtil.showToast(PhotoActivity.this, "imgFilename is not correct!");
+            return;
+        }
+        SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, Constant.URL_API_SHOPLOCATION,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, response);
+                        CommonUtil.showToast(PhotoActivity.this, "Upload succeed!");
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            if (imgUpload >= imgCaptured) return;
+                            for (int i = 0; i < 3; i++) {
+                                if (imgLocation[i][0] == -1) {
+                                    imgLocation[i][0] = (float)jsonObj.get("x");
+                                    imgLocation[i][1] = (float)jsonObj.get("y");
+                                    imgUpload++;
+                                    break;
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "", e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "", error);
+                CommonUtil.showToast(PhotoActivity.this, "Upload failed! Code:" + error.networkResponse.statusCode);
+            }
+        });
+        req.addFile("img", imgFilename);
+        //req.addMultipartParam("ext", "text/plain", imgFilename.substring(imgFilename.indexOf(".") + 1));
+        networkUtil.addReq(req);
     }
 }

@@ -249,7 +249,7 @@ public class SensorNetworkActivity extends AppCompatActivity {
                     return;
                 }
                 permitUpload = false;
-                SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, Constant.URL_API_UPLOAD,
+                SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, Constant.URL_API_SHOPLOCATION,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -271,8 +271,8 @@ public class SensorNetworkActivity extends AppCompatActivity {
                             CommonUtil.showToast(SensorNetworkActivity.this, "Upload failed! Code:" + error.networkResponse.statusCode);
                         }
                     });
-                req.addFile("file", imgFilename);
-                req.addMultipartParam("ext", "text/plain", imgFilename.substring(imgFilename.indexOf(".") + 1));
+                req.addFile("img", imgFilename);
+                //req.addMultipartParam("ext", "text/plain", imgFilename.substring(imgFilename.indexOf(".") + 1));
                 networkUtil.addReq(req);
             }
         });
