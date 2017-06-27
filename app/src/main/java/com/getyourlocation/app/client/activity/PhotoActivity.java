@@ -41,7 +41,10 @@ public class PhotoActivity extends AppCompatActivity {
     private Button captureBtn;
     private NetworkUtil networkUtil;
     private float [][] imgLocation = new float[3][2];
+    private boolean [] imgCapturedStatus = new boolean[3];
+    private boolean [] imgUploadStatus = new boolean[3];
     private int imgCaptured;
+    private int imgUpload;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,9 +154,11 @@ public class PhotoActivity extends AppCompatActivity {
     private void initData()
     {
         for (int i = 0; i < 3; i++) {
-            imgLocation[i][0] = -1;
+            imgCapturedStatus[i] = false;
+            imgUploadStatus[i] = false;
         }
         imgCaptured = 0;
+        imgUpload = 0;
     }
     /** upload single image */
     private void uploadImage(String imgFilename)
@@ -170,12 +175,12 @@ public class PhotoActivity extends AppCompatActivity {
                         CommonUtil.showToast(PhotoActivity.this, "Upload succeed!");
                         try {
                             JSONObject jsonObj = new JSONObject(response);
-                            if (imgCaptured == 3) return;
+                            if (imgUpload >= imgCaptured) return;
                             for (int i = 0; i < 3; i++) {
                                 if (imgLocation[i][0] == -1) {
                                     imgLocation[i][0] = (float)jsonObj.get("x");
                                     imgLocation[i][1] = (float)jsonObj.get("y");
-                                    imgCaptured++;
+                                    imgUpload++;
                                     break;
                                 }
                             }
