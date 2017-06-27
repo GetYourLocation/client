@@ -27,6 +27,7 @@ import com.getyourlocation.app.client.Constant;
 import com.getyourlocation.app.client.R;
 import com.getyourlocation.app.client.util.CommonUtil;
 import com.getyourlocation.app.client.util.NetworkUtil;
+import com.getyourlocation.app.client.util.PermissionUtil;
 import com.getyourlocation.app.client.util.SensorUtil;
 
 import org.json.JSONArray;
@@ -255,7 +256,8 @@ public class SensorNetworkActivity extends AppCompatActivity {
                             Log.d(TAG, response);
                             CommonUtil.showToast(SensorNetworkActivity.this, "Upload succeed!");
                             try {
-                                JSONArray jsonArr = new JSONArray(response);
+                                JSONObject jsonObj = new JSONObject(response);
+                                JSONArray jsonArr = jsonObj.getJSONArray("files");
                                 String uri = (String)jsonArr.get(0);
                                 showUploadedImg(Constant.URL_CLOUD_SERVER + uri);
                             } catch (Exception e) {

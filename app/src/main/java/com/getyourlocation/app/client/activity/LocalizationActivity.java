@@ -1,5 +1,6 @@
 package com.getyourlocation.app.client.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -27,6 +28,7 @@ public class LocalizationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 CommonUtil.showToast(LocalizationActivity.this, "Hello!");
+                startActivity(new Intent(LocalizationActivity.this, PhotoActivity.class));
             }
         });
     }
