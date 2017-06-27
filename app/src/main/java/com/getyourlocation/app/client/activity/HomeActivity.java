@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.getyourlocation.app.client.R;
+import com.getyourlocation.app.client.util.PermissionUtil;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -14,6 +15,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PermissionUtil.grantPermissions(this);
         Button testBtn = (Button) findViewById(R.id.main_test_btn);
         testBtn.setOnClickListener(new View.OnClickListener() {
             @Override
