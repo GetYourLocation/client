@@ -60,7 +60,6 @@ public class SensorNetworkActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor_network);
-        PermissionUtil.verifyStoragePermissions(this);
         initNetwork();
         initSensor();
         initSumProduct();
