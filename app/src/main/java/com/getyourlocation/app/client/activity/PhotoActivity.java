@@ -10,8 +10,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.error.AuthFailureError;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.StringRequest;
+import com.getyourlocation.app.client.Constant;
 import com.getyourlocation.app.client.R;
+import com.getyourlocation.app.client.util.CommonUtil;
+import com.getyourlocation.app.client.util.NetworkUtil;
 import com.getyourlocation.app.client.widget.CameraPreview;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +29,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static android.R.attr.y;
 
 /**
  * Created by xusy on 2017/6/27.
@@ -29,6 +43,7 @@ public class PhotoActivity extends AppCompatActivity {
     private Camera camera;
     private CameraPreview cameraPreview;
     private Button captureBtn;
+    private NetworkUtil networkUtil;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,5 +148,36 @@ public class PhotoActivity extends AppCompatActivity {
         }
 
         return mediaFile;
+    }
+    public void TrianglePosition(float alpha, float beta, float x1, float y1, float x2, float y2, float x3, float y3) {
+        StringRequest req = new StringRequest(Request.Method.GET, Constant.URL_API_POSITION,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {  // Called when server respond
+                        Log.d(TAG, response);
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            float x = (float)jsonObj.get("x");
+                            float y = (float)jsonObj.get("y");
+                            CommonUtil.showToast(PhotoActivity.this, "x:" + x + ",y:" + y);
+                        } catch (Exception e) {
+                            Log.e(TAG, "", e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "", error);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                //params.put("x", String.valueOf(x));
+                //params.put("y", String.valueOf(y));
+                return params;
+            }
+        };
+        networkUtil.addReq(req);
     }
 }
