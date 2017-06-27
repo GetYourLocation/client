@@ -35,7 +35,6 @@ public class LocalizationActivity extends AppCompatActivity {
         locationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-<<<<<<< HEAD
                 Intent intent=new Intent();
                 intent.setClass(LocalizationActivity.this, testActivity.class);
                 //intent.putExtra("str", "Intent Demo");
