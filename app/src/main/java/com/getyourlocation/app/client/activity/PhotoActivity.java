@@ -1,5 +1,7 @@
 package com.getyourlocation.app.client.activity;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
@@ -13,6 +15,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -62,7 +66,7 @@ public class PhotoActivity extends AppCompatActivity {
     private Button captureBtn;
 
 
-    private File[] refPicture;
+    private File[] refPicture = new File[3];
 
     private Button testBtn;
     private Button PositionBtn;
@@ -72,19 +76,22 @@ public class PhotoActivity extends AppCompatActivity {
     private boolean [] imgUploadStatus = new boolean[3];
     private int imgCaptured;
     private int imgUpload;
+    private ImageView[] mipmap = new ImageView[3];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo);
+        setContentView(R.layout.activity_camera);
         Index.initIndex();
-        initNetwork();
+    //    initNetwork();
+        initMipmap();
+        initCancelBtn();
         initCamera();
         initSensor();
         initCaptureBtn();
-        initData();
-        initTestBtn();
-        initPositionBtn();
+     //   initData();
+     //   initTestBtn();
+      //  initPositionBtn();
 
     }
     private void initPositionBtn() {
@@ -113,6 +120,47 @@ public class PhotoActivity extends AppCompatActivity {
         });
     }
 
+
+    private void initMipmap(){
+        mipmap[0] =(ImageView) findViewById(R.id.mipmap1);
+        mipmap[0].setImageResource(R.mipmap.ic_launcher_round);
+        mipmap[0].setVisibility(View.VISIBLE);
+        mipmap[1] =(ImageView) findViewById(R.id.mipmap2);
+        mipmap[1].setImageResource(R.mipmap.ic_launcher_round);
+        mipmap[1].setVisibility(View.VISIBLE);
+        mipmap[2] =(ImageView) findViewById(R.id.mipmap3);
+        mipmap[2].setImageResource(R.mipmap.ic_launcher_round);
+        mipmap[2].setVisibility(View.VISIBLE);
+    }
+    private void initCancelBtn(){
+        ImageButton cancelBtn1 = (ImageButton) findViewById(R.id.cancel_1);
+            cancelBtn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImageView mipmap1 = (ImageView) findViewById(R.id.mipmap1);
+                mipmap1.setImageResource(R.mipmap.ic_launcher_round);
+                Index.resetIndex(0);
+            }
+        });
+        ImageButton cancelBtn2 = (ImageButton) findViewById(R.id.cancel_2);
+        cancelBtn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImageView mipmap2 = (ImageView) findViewById(R.id.mipmap2);
+                mipmap2.setImageResource(R.mipmap.ic_launcher_round);
+                Index.resetIndex(1);
+            }
+        });
+        ImageButton cancelBtn3 = (ImageButton) findViewById(R.id.cancel_3);
+        cancelBtn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImageView mipmap3 = (ImageView) findViewById(R.id.mipmap3);
+                mipmap3.setImageResource(R.mipmap.ic_launcher_round);
+                Index.resetIndex(2);
+            }
+        });
+    }
     private void initNetwork() {
         networkUtil = NetworkUtil.getInstance(this);
     }
@@ -151,11 +199,11 @@ public class PhotoActivity extends AppCompatActivity {
 
             }
         });
-        FrameLayout layout = (FrameLayout) findViewById(R.id.photo_preview_layout);
+        FrameLayout layout = (FrameLayout) findViewById(R.id.mypreviewlayout);
         layout.addView(cameraPreview);
     }
     private void initCaptureBtn() {
-        captureBtn = (Button) findViewById(R.id.capture_btn);
+        captureBtn = (Button) findViewById(R.id.button_shoot);
         captureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -179,6 +227,10 @@ public class PhotoActivity extends AppCompatActivity {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
                 fos.close();
+                String filepath = pictureFile.getAbsolutePath();
+                Bitmap pic = BitmapFactory.decodeFile(filepath);
+                mipmap[Index.getAvailableIndex()].setImageBitmap(pic);
+                refPicture[Index.getAvailableIndex()] = pictureFile;
 
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "File not found: " + e.getMessage());
@@ -187,26 +239,6 @@ public class PhotoActivity extends AppCompatActivity {
             }
         }
     };
-
-//    private void saveFrameToFile(byte[] raw) {
-//        Camera.Size size = cameraPreview.getPreviewSize();
-//        YuvImage im = new YuvImage(raw, ImageFormat.NV21, size.width, size.height, null);
-//        Rect r = new Rect(0, 0, size.width, size.height);
-//        ByteArrayOutputStream jpegStream = new ByteArrayOutputStream();
-//        im.compressToJpeg(r, CameraPreview.JPEG_QUALITY, jpegStream);
-//        String filename = framesDir.getPath() + File.separator + frameCnt + ".jpg";
-//        File frameFile = new File(filename);
-//        try {
-//            FileOutputStream fos = new FileOutputStream(frameFile);
-//            fos.write(jpegStream.toByteArray());
-//            fos.close();
-//            jpegStream.close();
-//            Log.d(TAG, "Frame " + frameCnt + " saved");
-//            ++frameCnt;
-//        } catch (Exception e) {
-//            Log.e(TAG, "", e);
-//        }
-//    }
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     /** Create a file Uri for saving an image or video */
@@ -233,11 +265,9 @@ public class PhotoActivity extends AppCompatActivity {
         }
 
         // Create a media file name
-    //    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE){
-//            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-//                    "IMG_"+ timeStamp + ".jpg");
             mediaFile = new File(mediaStorageDir.getPath()+File.separator+"ref"+
                     Index.getAvailableIndex()+".jpg");
         } else {
@@ -297,7 +327,6 @@ public class PhotoActivity extends AppCompatActivity {
             }
         });
         req.addFile("img", imgFilename);
-        //req.addMultipartParam("ext", "text/plain", imgFilename.substring(imgFilename.indexOf(".") + 1));
         Log.d(TAG, req.toString());
         networkUtil.addReq(req);
     }
@@ -313,10 +342,6 @@ public class PhotoActivity extends AppCompatActivity {
                             JSONObject jsonObj = new JSONObject(response);
                             double x = ((Number)jsonObj.get("x")).doubleValue();
                             double y = ((Number)jsonObj.get("y")).doubleValue();
-                        //    float x = Float.valueOf((String) jsonObj.get("x")).floatValue();
-                        //    float y = Float.valueOf((String) jsonObj.get("y")).floatValue();
-//                            float x = (float)jsonObj.get("x");
-//                            float y = (float)jsonObj.get("y");
                             CommonUtil.showToast(PhotoActivity.this, "x:" + x + ",y:" + y);
                         } catch (Exception e) {
                             Log.e(TAG, "", e);

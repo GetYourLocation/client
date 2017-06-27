@@ -33,33 +33,18 @@ import com.getyourlocation.app.client.util.CommonUtil;
 import com.getyourlocation.app.client.util.NetworkUtil;
 import com.getyourlocation.app.client.util.SensorUtil;
 import com.getyourlocation.app.client.widget.CameraPreview;
-import com.getyourlocation.app.client.widget.CollectData;
+
 
 public class CameraActivity extends AppCompatActivity {
     private Camera camera;
     private CameraPreview cameraPreview;
     private Button shootBtn;
-    private CollectData collectData;
     private boolean isRecording = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         if (getRequestedOrientation()!= ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
-
-        camera = Camera.open();
-        cameraPreview = new CameraPreview(this,camera, new Camera.PreviewCallback() {
-            @Override
-            public void onPreviewFrame(byte[] data, Camera camera) {
-                if (isRecording) {
-
-                }
-            }
-        });
-        if (cameraPreview != null) {
-            FrameLayout layout = (FrameLayout)findViewById(R.id.mypreviewlayout);
-            layout.addView(cameraPreview);
         }
 
         super.onCreate(savedInstanceState);
@@ -83,7 +68,7 @@ public class CameraActivity extends AppCompatActivity {
                 mipmap3.setVisibility(View.VISIBLE);
             }
         });
-        collectData.initCaptureBtn(shootBtn,camera);
+
         Button uploadBtn = (Button) findViewById(R.id.button_upload);
         uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
