@@ -3,6 +3,7 @@ package com.getyourlocation.app.client.activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -35,8 +36,9 @@ public class LocalizationActivity extends AppCompatActivity {
         locationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "test...");
                 Intent intent=new Intent();
-                intent.setClass(LocalizationActivity.this, testActivity.class);
+                intent.setClass(LocalizationActivity.this, PhotoActivity.class);
                 //intent.putExtra("str", "Intent Demo");
                 startActivityForResult(intent, REQUEST_CODE);
             }

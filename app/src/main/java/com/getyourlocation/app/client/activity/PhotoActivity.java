@@ -12,8 +12,10 @@ import android.widget.FrameLayout;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.SimpleMultiPartRequest;
+import com.android.volley.request.StringRequest;
 import com.getyourlocation.app.client.Constant;
 import com.getyourlocation.app.client.R;
 import com.getyourlocation.app.client.util.CommonUtil;
@@ -29,6 +31,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by xusy on 2017/6/27.
@@ -39,6 +43,8 @@ public class PhotoActivity extends AppCompatActivity {
     private Camera camera;
     private CameraPreview cameraPreview;
     private Button captureBtn;
+    private Button testBtn;
+    private Button PositionBtn;
     private NetworkUtil networkUtil;
     private float [][] imgLocation = new float[3][2];
     private boolean [] imgCapturedStatus = new boolean[3];
@@ -49,10 +55,41 @@ public class PhotoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
+        initNetwork();
         initCamera();
         initCaptureBtn();
         initData();
+        initTestBtn();
+        initPositionBtn();
     }
+    private void initPositionBtn() {
+        PositionBtn = (Button) findViewById(R.id.position_btn);
+        PositionBtn.setOnClickListener(new View.OnClickListener() {
+            float alpha = 100;
+            float beta = 100;
+            float x1 = 100, y1 = 100, x2 = 100, y2 = 100, x3 = 100, y3 = 100;
+            @Override
+            public void onClick(View v) {
+                TrianglePosition(alpha, beta, x1, y1, x2, y2, x3, y3);
+            }
+        });
+    }
+
+    private void initTestBtn() {
+        testBtn = (Button) findViewById(R.id.test_btn);
+        testBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                uploadImage("/storage/emulated/0/tencent/MicroMsg/WeiXin/mmexport1495269258215.jpg");
+            }
+        });
+    }
+
+    private void initNetwork() {
+        networkUtil = NetworkUtil.getInstance(this);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -89,7 +126,7 @@ public class PhotoActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 camera.takePicture(null, null, pictureCallBack);
-                camera.startPreview();
+
             }
         });
     }
@@ -175,11 +212,12 @@ public class PhotoActivity extends AppCompatActivity {
                         CommonUtil.showToast(PhotoActivity.this, "Upload succeed!");
                         try {
                             JSONObject jsonObj = new JSONObject(response);
-                            if (imgUpload >= imgCaptured) return;
+                            //if (imgUpload >= imgCaptured) return;
                             for (int i = 0; i < 3; i++) {
-                                if (imgLocation[i][0] == -1) {
+                                if (imgCapturedStatus[i] == true && imgUploadStatus[i] == false) {
                                     imgLocation[i][0] = (float)jsonObj.get("x");
                                     imgLocation[i][1] = (float)jsonObj.get("y");
+                                    imgUploadStatus[i] = true;
                                     imgUpload++;
                                     break;
                                 }
@@ -197,6 +235,46 @@ public class PhotoActivity extends AppCompatActivity {
         });
         req.addFile("img", imgFilename);
         //req.addMultipartParam("ext", "text/plain", imgFilename.substring(imgFilename.indexOf(".") + 1));
+        Log.d(TAG, req.toString());
+        networkUtil.addReq(req);
+    }
+
+    public void TrianglePosition(final float alpha, final float beta, final float x1, final float y1,
+                                 final float x2, final float y2, final float x3, final float y3) {
+        StringRequest req = new StringRequest(Request.Method.GET, Constant.URL_API_POSITION,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {  // Called when server respond
+                        Log.d(TAG, response);
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            float x = (float)jsonObj.get("x");
+                            float y = (float)jsonObj.get("y");
+                            CommonUtil.showToast(PhotoActivity.this, "x:" + x + ",y:" + y);
+                        } catch (Exception e) {
+                            Log.e(TAG, "", e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "", error);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("alpha", String.valueOf(alpha));
+                params.put("beta", String.valueOf(beta));
+                params.put("x1", String.valueOf(x1));
+                params.put("y1", String.valueOf(y1));
+                params.put("x2", String.valueOf(x2));
+                params.put("y2", String.valueOf(y2));
+                params.put("x3", String.valueOf(x3));
+                params.put("y3", String.valueOf(y3));
+                return params;
+            }
+        };
         networkUtil.addReq(req);
     }
 }
