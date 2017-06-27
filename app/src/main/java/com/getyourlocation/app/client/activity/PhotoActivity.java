@@ -90,9 +90,9 @@ public class PhotoActivity extends AppCompatActivity {
     private void initPositionBtn() {
         PositionBtn = (Button) findViewById(R.id.position_btn);
         PositionBtn.setOnClickListener(new View.OnClickListener() {
-            float alpha = 100;
-            float beta = 100;
-            float x1 = 100, y1 = 100, x2 = 100, y2 = 100, x3 = 100, y3 = 100;
+            float alpha = 45;
+            float beta = 45;
+            float x1 = -1, y1 = 0, x2 = 0, y2 = -1, x3 = 1, y3 = 0;
             @Override
             public void onClick(View v) {
                 TrianglePosition(alpha, beta, x1, y1, x2, y2, x3, y3);
@@ -105,7 +105,10 @@ public class PhotoActivity extends AppCompatActivity {
         testBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //   uploadImage("/storage/emulated/0/tencent/MicroMsg/WeiXin/mmexport1495269258215.jpg");
+                File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES ),"CollectData");
+                  uploadImage(mediaStorageDir.getPath()+File.separator+"ref"+
+                         "0"+".jpg");
             }
         });
     }
@@ -185,6 +188,25 @@ public class PhotoActivity extends AppCompatActivity {
         }
     };
 
+//    private void saveFrameToFile(byte[] raw) {
+//        Camera.Size size = cameraPreview.getPreviewSize();
+//        YuvImage im = new YuvImage(raw, ImageFormat.NV21, size.width, size.height, null);
+//        Rect r = new Rect(0, 0, size.width, size.height);
+//        ByteArrayOutputStream jpegStream = new ByteArrayOutputStream();
+//        im.compressToJpeg(r, CameraPreview.JPEG_QUALITY, jpegStream);
+//        String filename = framesDir.getPath() + File.separator + frameCnt + ".jpg";
+//        File frameFile = new File(filename);
+//        try {
+//            FileOutputStream fos = new FileOutputStream(frameFile);
+//            fos.write(jpegStream.toByteArray());
+//            fos.close();
+//            jpegStream.close();
+//            Log.d(TAG, "Frame " + frameCnt + " saved");
+//            ++frameCnt;
+//        } catch (Exception e) {
+//            Log.e(TAG, "", e);
+//        }
+//    }
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     /** Create a file Uri for saving an image or video */
@@ -250,11 +272,16 @@ public class PhotoActivity extends AppCompatActivity {
                             JSONObject jsonObj = new JSONObject(response);
                             //if (imgUpload >= imgCaptured) return;
                             for (int i = 0; i < 3; i++) {
-                                if (imgCapturedStatus[i] == true && imgUploadStatus[i] == false) {
-                                    imgLocation[i][0] = (float)jsonObj.get("x");
-                                    imgLocation[i][1] = (float)jsonObj.get("y");
+                             //   if (imgCapturedStatus[i] == true && imgUploadStatus[i] == false) {
+                                if (true) {
+
+                                    double x = ((Number)jsonObj.get("x")).doubleValue();
+                                    double y = ((Number)jsonObj.get("y")).doubleValue();
+                                    imgLocation[i][0] = (float) x;
+                                    imgLocation[i][1] =  (float)y;
                                     imgUploadStatus[i] = true;
                                     imgUpload++;
+                                    CommonUtil.showToast(PhotoActivity.this, "location is x:"+imgLocation[i][0]+" y:"+imgLocation[i][1]);
                                     break;
                                 }
                             }
@@ -284,8 +311,12 @@ public class PhotoActivity extends AppCompatActivity {
                         Log.d(TAG, response);
                         try {
                             JSONObject jsonObj = new JSONObject(response);
-                            float x = (float)jsonObj.get("x");
-                            float y = (float)jsonObj.get("y");
+                            double x = ((Number)jsonObj.get("x")).doubleValue();
+                            double y = ((Number)jsonObj.get("y")).doubleValue();
+                        //    float x = Float.valueOf((String) jsonObj.get("x")).floatValue();
+                        //    float y = Float.valueOf((String) jsonObj.get("y")).floatValue();
+//                            float x = (float)jsonObj.get("x");
+//                            float y = (float)jsonObj.get("y");
                             CommonUtil.showToast(PhotoActivity.this, "x:" + x + ",y:" + y);
                         } catch (Exception e) {
                             Log.e(TAG, "", e);
