@@ -19,7 +19,7 @@ import com.android.volley.toolbox.Volley;
 public class NetworkUtil {
     private static final String TAG = "NetworkUtil";
     private static final String REQ_TAG = "req";
-    private static final int REQ_TIMEOUT = 3000;
+    private static final int REQ_TIMEOUT = 10000;
 
     private static NetworkUtil instance = null;
 

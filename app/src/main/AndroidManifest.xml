@@ -14,11 +14,12 @@
 
     <!-- Recording -->
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
-        android:name="com.getyourlocation.app.client.GYLApp"
+        android:name=".GYLApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -26,7 +27,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.getyourlocation.app.client.activity.HomeActivity"
+            android:name=".activity.HomeActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
@@ -36,15 +37,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.getyourlocation.app.client.activity.SensorNetworkActivity"
+            android:name=".activity.SensorNetworkActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.getyourlocation.app.client.activity.CollectDataActivity"
+            android:name=".activity.CollectDataActivity"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.getyourlocation.app.client.activity.LocalizationActivity"
+            android:name=".activity.LocalizationActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
@@ -55,6 +56,8 @@
             android:name="com.getyourlocation.app.client.activity.IndoorMapActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".activity.testActivity" />
+        <activity android:name=".util.LocationUtil"></activity>
     </application>
 
 </manifest>
