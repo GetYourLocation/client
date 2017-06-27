@@ -26,7 +26,7 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
-    compile 'dev.dworks.libs:volleyplus:+'
+    compile 'dev.dworks.libs:volleyplus:0.1.4'
     compile 'sysu.mobile.limk:indoormapview:0.2'
     compile 'sysu.mobile.limk:sensorutils:0.21'
     testCompile 'junit:junit:4.12'
