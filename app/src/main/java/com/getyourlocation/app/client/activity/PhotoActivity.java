@@ -122,7 +122,7 @@ public class PhotoActivity extends AppCompatActivity {
                     float x3 = imgLocation[2][0];
                     float y3 = imgLocation[2][1];
 //                   a test example
-//                   alpha = 45; beta = 45;x1 =-1;y1=0;x2=0;y2=-1;x3=1;y3=0;
+                    alpha = 45; beta = 45;x1 =-1;y1=0;x2=0;y2=-1;x3=1;y3=0;
                     TrianglePosition(alpha, beta, x1, y1, x2, y2, x3, y3);
                 }
             }
@@ -351,7 +351,9 @@ public class PhotoActivity extends AppCompatActivity {
                             double y = ((Number)jsonObj.get("y")).doubleValue();
                             userLocation[0] = (float)x;
                             userLocation[1] = (float)y;
-
+                            // uncompleted api test
+                            userLocation[0] = (float)100;
+                            userLocation[1] = (float)120;
                             Log.d(TAG,  "x:" + x + ",y:" + y);
                             CommonUtil.showToast(PhotoActivity.this, "x:" + x + ",y:" + y);
                           //  Thread.currentThread().sleep(5000);
