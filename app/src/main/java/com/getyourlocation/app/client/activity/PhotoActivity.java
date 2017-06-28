@@ -1,14 +1,22 @@
 package com.getyourlocation.app.client.activity;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -18,10 +26,14 @@ import com.android.volley.request.SimpleMultiPartRequest;
 import com.android.volley.request.StringRequest;
 import com.getyourlocation.app.client.Constant;
 import com.getyourlocation.app.client.R;
+import com.getyourlocation.app.client.util.SensorUtil;
 import com.getyourlocation.app.client.util.CommonUtil;
 import com.getyourlocation.app.client.util.NetworkUtil;
-import com.getyourlocation.app.client.widget.CameraPreview;
 
+import com.getyourlocation.app.client.widget.CameraPreview;
+import com.getyourlocation.app.client.widget.Index;
+
+import java.io.ByteArrayOutputStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -30,9 +42,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * Created by xusy on 2017/6/27.
@@ -40,9 +55,19 @@ import java.util.Map;
 
 public class PhotoActivity extends AppCompatActivity {
     private static final String TAG = "PhotoActivity";
+
+
+    private File framesDir;
+    private SensorUtil sensorUtil;
+    private List<String> sensorData;
+
     private Camera camera;
     private CameraPreview cameraPreview;
     private Button captureBtn;
+
+
+    private File[] refPicture = new File[3];
+
     private Button testBtn;
     private Button PositionBtn;
     private NetworkUtil networkUtil;
@@ -51,23 +76,30 @@ public class PhotoActivity extends AppCompatActivity {
     private boolean [] imgUploadStatus = new boolean[3];
     private int imgCaptured;
     private int imgUpload;
+    private ImageView[] mipmap = new ImageView[3];
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo);
-        initNetwork();
+        setContentView(R.layout.activity_camera);
+        Index.initIndex();
+    //    initNetwork();
+        initMipmap();
+        initCancelBtn();
         initCamera();
+        initSensor();
         initCaptureBtn();
-        initData();
-        initTestBtn();
-        initPositionBtn();
+     //   initData();
+     //   initTestBtn();
+      //  initPositionBtn();
+
     }
     private void initPositionBtn() {
         PositionBtn = (Button) findViewById(R.id.position_btn);
         PositionBtn.setOnClickListener(new View.OnClickListener() {
-            float alpha = 100;
-            float beta = 100;
-            float x1 = 100, y1 = 100, x2 = 100, y2 = 100, x3 = 100, y3 = 100;
+            float alpha = 45;
+            float beta = 45;
+            float x1 = -1, y1 = 0, x2 = 0, y2 = -1, x3 = 1, y3 = 0;
             @Override
             public void onClick(View v) {
                 TrianglePosition(alpha, beta, x1, y1, x2, y2, x3, y3);
@@ -80,12 +112,55 @@ public class PhotoActivity extends AppCompatActivity {
         testBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                uploadImage("/storage/emulated/0/tencent/MicroMsg/WeiXin/mmexport1495269258215.jpg");
+                File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES ),"CollectData");
+                  uploadImage(mediaStorageDir.getPath()+File.separator+"ref"+
+                         "0"+".jpg");
             }
         });
     }
 
+
+    private void initMipmap(){
+        mipmap[0] =(ImageView) findViewById(R.id.mipmap1);
+        mipmap[0].setImageResource(R.mipmap.ic_launcher_round);
+        mipmap[0].setVisibility(View.VISIBLE);
+        mipmap[1] =(ImageView) findViewById(R.id.mipmap2);
+        mipmap[1].setImageResource(R.mipmap.ic_launcher_round);
+        mipmap[1].setVisibility(View.VISIBLE);
+        mipmap[2] =(ImageView) findViewById(R.id.mipmap3);
+        mipmap[2].setImageResource(R.mipmap.ic_launcher_round);
+        mipmap[2].setVisibility(View.VISIBLE);
+    }
+    private void initCancelBtn(){
+        ImageButton cancelBtn1 = (ImageButton) findViewById(R.id.cancel_1);
+            cancelBtn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImageView mipmap1 = (ImageView) findViewById(R.id.mipmap1);
+                mipmap1.setImageResource(R.mipmap.ic_launcher_round);
+                Index.resetIndex(0);
+            }
+        });
+        ImageButton cancelBtn2 = (ImageButton) findViewById(R.id.cancel_2);
+        cancelBtn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImageView mipmap2 = (ImageView) findViewById(R.id.mipmap2);
+                mipmap2.setImageResource(R.mipmap.ic_launcher_round);
+                Index.resetIndex(1);
+            }
+        });
+        ImageButton cancelBtn3 = (ImageButton) findViewById(R.id.cancel_3);
+        cancelBtn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImageView mipmap3 = (ImageView) findViewById(R.id.mipmap3);
+                mipmap3.setImageResource(R.mipmap.ic_launcher_round);
+                Index.resetIndex(2);
+            }
+        });
+    }
     private void initNetwork() {
         networkUtil = NetworkUtil.getInstance(this);
     }
@@ -93,11 +168,13 @@ public class PhotoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        sensorUtil.register();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        sensorUtil.unregister();
         releaseCamera();
     }
 
@@ -108,6 +185,12 @@ public class PhotoActivity extends AppCompatActivity {
             camera = null;
         }
     }
+    private void initSensor() {
+        sensorData = new ArrayList<>();
+        sensorUtil = SensorUtil.getInstance(this);
+    }
+
+
     private void initCamera() {
         camera = Camera.open();
         cameraPreview = new CameraPreview(this, camera, new Camera.PreviewCallback() {
@@ -116,24 +199,25 @@ public class PhotoActivity extends AppCompatActivity {
 
             }
         });
-        FrameLayout layout = (FrameLayout) findViewById(R.id.photo_preview_layout);
+        FrameLayout layout = (FrameLayout) findViewById(R.id.mypreviewlayout);
         layout.addView(cameraPreview);
     }
     private void initCaptureBtn() {
-        captureBtn = (Button) findViewById(R.id.capture_btn);
+        captureBtn = (Button) findViewById(R.id.button_shoot);
         captureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                camera.takePicture(null, null, pictureCallBack);
-
+                if (Index.Available()) {
+                    camera.takePicture(null, null, pictureCallBack);
+                    camera.startPreview();
+                }
             }
         });
     }
     private Camera.PictureCallback pictureCallBack = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-
+            sensorData.add(sensorUtil.getSensorDataString());
             File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
             if (pictureFile == null){
                 Log.d(TAG, "Error creating media file, check storage permissions: " );
@@ -143,6 +227,10 @@ public class PhotoActivity extends AppCompatActivity {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
                 fos.close();
+                String filepath = pictureFile.getAbsolutePath();
+                Bitmap pic = BitmapFactory.decodeFile(filepath);
+                mipmap[Index.getAvailableIndex()].setImageBitmap(pic);
+                refPicture[Index.getAvailableIndex()] = pictureFile;
 
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "File not found: " + e.getMessage());
@@ -177,11 +265,11 @@ public class PhotoActivity extends AppCompatActivity {
         }
 
         // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE){
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".jpg");
+            mediaFile = new File(mediaStorageDir.getPath()+File.separator+"ref"+
+                    Index.getAvailableIndex()+".jpg");
         } else {
             return null;
         }
@@ -214,11 +302,16 @@ public class PhotoActivity extends AppCompatActivity {
                             JSONObject jsonObj = new JSONObject(response);
                             //if (imgUpload >= imgCaptured) return;
                             for (int i = 0; i < 3; i++) {
-                                if (imgCapturedStatus[i] == true && imgUploadStatus[i] == false) {
-                                    imgLocation[i][0] = (float)jsonObj.get("x");
-                                    imgLocation[i][1] = (float)jsonObj.get("y");
+                             //   if (imgCapturedStatus[i] == true && imgUploadStatus[i] == false) {
+                                if (true) {
+
+                                    double x = ((Number)jsonObj.get("x")).doubleValue();
+                                    double y = ((Number)jsonObj.get("y")).doubleValue();
+                                    imgLocation[i][0] = (float) x;
+                                    imgLocation[i][1] =  (float)y;
                                     imgUploadStatus[i] = true;
                                     imgUpload++;
+                                    CommonUtil.showToast(PhotoActivity.this, "location is x:"+imgLocation[i][0]+" y:"+imgLocation[i][1]);
                                     break;
                                 }
                             }
@@ -234,7 +327,6 @@ public class PhotoActivity extends AppCompatActivity {
             }
         });
         req.addFile("img", imgFilename);
-        //req.addMultipartParam("ext", "text/plain", imgFilename.substring(imgFilename.indexOf(".") + 1));
         Log.d(TAG, req.toString());
         networkUtil.addReq(req);
     }
@@ -248,8 +340,8 @@ public class PhotoActivity extends AppCompatActivity {
                         Log.d(TAG, response);
                         try {
                             JSONObject jsonObj = new JSONObject(response);
-                            float x = (float)jsonObj.get("x");
-                            float y = (float)jsonObj.get("y");
+                            double x = ((Number)jsonObj.get("x")).doubleValue();
+                            double y = ((Number)jsonObj.get("y")).doubleValue();
                             CommonUtil.showToast(PhotoActivity.this, "x:" + x + ",y:" + y);
                         } catch (Exception e) {
                             Log.e(TAG, "", e);
