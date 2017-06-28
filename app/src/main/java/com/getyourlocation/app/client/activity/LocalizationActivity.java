@@ -1,6 +1,7 @@
 package com.getyourlocation.app.client.activity;
 
 import android.content.Intent;
+import android.graphics.BitmapRegionDecoder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,7 @@ public class LocalizationActivity extends AppCompatActivity {
     private TextView infoTxt;
     private final static int REQUEST_CODE=1;
     private MapView mapView;
+    private float mapHeight;
 
 
     @Override
@@ -55,7 +57,7 @@ public class LocalizationActivity extends AppCompatActivity {
                 Bundle bundle=data.getExtras();
                 float x = bundle.getFloat("x");
                 float y = bundle.getFloat("y");
-                showLocation(x, y);
+                showLocation(x, mapHeight - y);
             }
         }
     }
@@ -64,6 +66,10 @@ public class LocalizationActivity extends AppCompatActivity {
     {
         try {
             mapView.initNewMap(getAssets().open(Constant.FILENAME_MAP), 1, 0, new Position(x, y));
+            BitmapRegionDecoder mMapDecoder = BitmapRegionDecoder.newInstance(
+                    getAssets().open(Constant.FILENAME_MAP), false);
+            mapHeight = mMapDecoder.getHeight();
+            System.out.println("mapHeight is:"+mMapDecoder.getHeight());
         } catch (IOException e) {
             e.printStackTrace();
         }
