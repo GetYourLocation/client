@@ -31,7 +31,7 @@ import java.util.List;
 public class CollectDataActivity extends AppCompatActivity {
     private static final String TAG = "CollectDataActivity";
     private static final String STORAGE_DIR = "GYL-Data";
-    private static final String FRAMES_DIR = "frames";
+    private static final String FRAMES_DIR = "JPEGImages";
     private static final String SENSOR_FILENAME = "sensor.csv";
 
     private TextView infoTxt;
