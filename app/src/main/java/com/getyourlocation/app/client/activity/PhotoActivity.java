@@ -3,14 +3,10 @@ package com.getyourlocation.app.client.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.ImageFormat;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -34,30 +30,20 @@ import com.getyourlocation.app.client.util.NetworkUtil;
 import com.getyourlocation.app.client.widget.CameraPreview;
 import com.getyourlocation.app.client.widget.Index;
 
-import java.io.ByteArrayOutputStream;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
 
-/**
- * Created by xusy on 2017/6/27.
- */
-
 public class PhotoActivity extends AppCompatActivity {
     private static final String TAG = "PhotoActivity";
-    public final static int RESULT_CODE=1;
+    public final static int RES_POSITION = 1;
 
     private SensorUtil sensorUtil;
     private NetworkUtil networkUtil;
@@ -81,7 +67,7 @@ public class PhotoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
+        setContentView(R.layout.activity_photo);
         Index.initIndex();
         initData();
         initNetwork();
@@ -91,19 +77,21 @@ public class PhotoActivity extends AppCompatActivity {
         initCamera();
         initCaptureBtn();
         initPositionBtn();
-
     }
+
     private void returnResult() {
         float[] result = getUserLocation();
         Intent intent=new Intent();
         intent.putExtra("x", result[0]);
         intent.putExtra("y", result[1]);
-        setResult(RESULT_CODE, intent);
+        setResult(RES_POSITION, intent);
         finish();
     }
+
     private float[] getUserLocation() {
         return userLocation;
     }
+
     private void initPositionBtn() {
         PositionBtn = (Button) findViewById(R.id.button_upload);
         PositionBtn.setOnClickListener(new View.OnClickListener() {
@@ -139,6 +127,7 @@ public class PhotoActivity extends AppCompatActivity {
         mipmap[2].setImageResource(R.mipmap.ic_launcher_round);
         mipmap[2].setVisibility(View.VISIBLE);
     }
+
     private void initCancelBtn(){
         ImageButton cancelBtn1 = (ImageButton) findViewById(R.id.cancel_1);
             cancelBtn1.setOnClickListener(new View.OnClickListener() {
@@ -168,6 +157,7 @@ public class PhotoActivity extends AppCompatActivity {
             }
         });
     }
+
     private void initNetwork() {
         networkUtil = NetworkUtil.getInstance(this);
     }
@@ -199,7 +189,6 @@ public class PhotoActivity extends AppCompatActivity {
         sensorUtil = SensorUtil.getInstance(this);
     }
 
-
     private void initCamera() {
         camera = Camera.open();
         cameraPreview = new CameraPreview(this, camera, new Camera.PreviewCallback() {
@@ -211,6 +200,7 @@ public class PhotoActivity extends AppCompatActivity {
         FrameLayout layout = (FrameLayout) findViewById(R.id.mypreviewlayout);
         layout.addView(cameraPreview);
     }
+
     private void initCaptureBtn() {
         captureBtn = (Button) findViewById(R.id.button_shoot);
         captureBtn.setOnClickListener(new View.OnClickListener() {
@@ -223,10 +213,10 @@ public class PhotoActivity extends AppCompatActivity {
             }
         });
     }
+
     private Camera.PictureCallback pictureCallBack = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-
             File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
             if (pictureFile == null){
                 Log.d(TAG, "Error creating media file, check storage permissions: " );
@@ -253,12 +243,12 @@ public class PhotoActivity extends AppCompatActivity {
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     /** Create a file Uri for saving an image or video */
-    public static Uri getOutputMediaFileUri(int type){
+    public static Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile(type));
     }
 
     /** Create a File for saving an image or video */
-    public static File getOutputMediaFile(int type){
+    public static File getOutputMediaFile(int type) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
@@ -287,8 +277,8 @@ public class PhotoActivity extends AppCompatActivity {
 
         return mediaFile;
     }
-    private void initData()
-    {
+
+    private void initData() {
         for (int i = 0; i < 3; i++) {
             imgCapturedStatus[i] = false;
             imgUploadStatus[i] = false;
@@ -298,14 +288,14 @@ public class PhotoActivity extends AppCompatActivity {
         userLocation[0] = 0;
         userLocation[1] = 0;
     }
+
     /** upload single image */
-    private void uploadImage(final String imgFilename)
-    {
+    private void uploadImage(final String imgFilename) {
         if (imgFilename == null || imgFilename.isEmpty()) {
             CommonUtil.showToast(PhotoActivity.this, "imgFilename is not correct!");
             return;
         }
-        SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, Constant.URL_API_SHOPLOCATION,
+        SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, Constant.URL_API_SHOP_LOCATION,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {

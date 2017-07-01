@@ -241,15 +241,17 @@ public class SensorNetworkActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!permitUpload) {
-                    CommonUtil.showToast(SensorNetworkActivity.this, "Restart this activity to upload the next image!");
+                    CommonUtil.showToast(SensorNetworkActivity.this,
+                            "Restart this activity to upload the next image!");
                     return;
                 }
                 if (imgFilename == null || imgFilename.isEmpty()) {
-                    CommonUtil.showToast(SensorNetworkActivity.this, "Click the circle to select an image first!");
+                    CommonUtil.showToast(SensorNetworkActivity.this,
+                            "Click the circle to select an image first!");
                     return;
                 }
                 permitUpload = false;
-                SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, Constant.URL_API_LOCALIZATION,
+                SimpleMultiPartRequest req = new SimpleMultiPartRequest(Request.Method.POST, Constant.URL_API_UPLOAD,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -268,12 +270,12 @@ public class SensorNetworkActivity extends AppCompatActivity {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             Log.e(TAG, "", error);
-                            CommonUtil.showToast(SensorNetworkActivity.this, "Upload failed! Code:" + error.networkResponse.statusCode);
+                            CommonUtil.showToast(SensorNetworkActivity.this,
+                                    "Upload failed! Code:" + error.networkResponse.statusCode);
                         }
                     });
-                req.addFile("img", imgFilename);
-                Log.d(TAG, req.toString());
-                //req.addMultipartParam("ext", "text/plain", imgFilename.substring(imgFilename.indexOf(".") + 1));
+                req.addFile("file", imgFilename);
+                req.addMultipartParam("ext", "text/plain", imgFilename.substring(imgFilename.indexOf(".") + 1));
                 networkUtil.addReq(req);
             }
         });
