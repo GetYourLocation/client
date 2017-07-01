@@ -23,13 +23,6 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(HomeActivity.this, SensorNetworkActivity.class));
             }
         });
-        Button indoorMapBtn = (Button) findViewById(R.id.main_indoorMap_btn);
-        indoorMapBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, IndoorMapActivity.class));
-            }
-        });
         Button dataBtn = (Button) findViewById(R.id.main_data_btn);
         dataBtn.setOnClickListener(new View.OnClickListener() {
             @Override
