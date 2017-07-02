@@ -187,7 +187,7 @@ public class CollectDataActivity extends AppCompatActivity {
         recordBtn.setText("Start");
         isRecording = false;
         saveSensorDataToFile();
-        infoTxt.setText("Data saved to " + framesDir.getParent());
+        infoTxt.setText("Frame count: " + (frameCnt - 1) + "\nData saved to " + framesDir.getParent());
     }
 
     private void saveSensorDataToFile() {
