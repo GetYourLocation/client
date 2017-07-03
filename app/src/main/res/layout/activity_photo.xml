@@ -109,6 +109,22 @@
             android:weightSum="1">
 
             <Button
+                android:id="@+id/button_zoomIn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:textSize="18sp"
+                android:text="放大" />
+
+            <Button
+                android:id="@+id/button_zoomOut"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:textSize="18sp"
+                android:text="缩小" />
+
+            <Button
                 android:id="@+id/button_shoot"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

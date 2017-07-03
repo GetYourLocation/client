@@ -66,7 +66,7 @@ public class PhotoActivity extends AppCompatActivity {
     private float[] userLocation = new float[2];
     private boolean isView = true;
     private boolean initCam = false;
-
+    private int zoomValue = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +80,7 @@ public class PhotoActivity extends AppCompatActivity {
         initCamera();
         initCaptureBtn();
         initPositionBtn();
+        initZoomBtn();
     }
 
     private void returnResult() {
@@ -130,7 +131,24 @@ public class PhotoActivity extends AppCompatActivity {
         mipmap[2].setImageResource(R.mipmap.ic_launcher_round);
         mipmap[2].setVisibility(View.VISIBLE);
     }
-
+    private void initZoomBtn() {
+        final Button zoomIn = (Button) findViewById(R.id.button_zoomIn);
+        zoomIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (zoomValue <= 100)
+                setZoom(5);
+            }
+        });
+        Button zoomOut = (Button) findViewById(R.id.button_zoomOut);
+        zoomOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (zoomValue >= 0)
+                setZoom(-5);
+            }
+        });
+    }
     private void initCancelBtn(){
         ImageButton cancelBtn1 = (ImageButton) findViewById(R.id.cancel_1);
             cancelBtn1.setOnClickListener(new View.OnClickListener() {
@@ -289,6 +307,17 @@ public class PhotoActivity extends AppCompatActivity {
             }
         }
     };
+    public void setZoom(int value){
+        try{
+            Camera.Parameters params = camera.getParameters();
+            zoomValue += value;
+            params.setZoom(zoomValue);
+            camera.setParameters(params);
+            Log.d(TAG, "Is support Zoom " + params.isZoomSupported());
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     /** Create a file Uri for saving an image or video */
