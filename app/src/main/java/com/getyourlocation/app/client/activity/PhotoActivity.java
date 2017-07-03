@@ -3,6 +3,7 @@ package com.getyourlocation.app.client.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
@@ -208,10 +209,31 @@ public class PhotoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (Index.Available()) {
                     camera.takePicture(null, null, pictureCallBack);
-                    camera.startPreview();
                 }
             }
         });
+    }
+
+    /**
+     *  处理图片
+     * @param bm 所要转换的bitmap
+     * @param newWidth 新的宽
+     * @param newHeight 新的高
+     * @return 指定宽高的bitmap
+     */
+    private static Bitmap resizeImg(Bitmap bm, int newWidth ,int newHeight){
+        // 获得图片的宽高
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        // 计算缩放比例
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // 取得想要缩放的matrix参数
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        // 得到新的图片
+        Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+        return newbm;
     }
 
     private Camera.PictureCallback pictureCallBack = new Camera.PictureCallback() {
@@ -220,14 +242,21 @@ public class PhotoActivity extends AppCompatActivity {
             File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
             if (pictureFile == null){
                 Log.d(TAG, "Error creating media file, check storage permissions: " );
+                camera.startPreview();
                 return;
             }
             try {
+                camera.startPreview();
                 FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
+//                fos.write(data);
+                Bitmap originPic = BitmapFactory.decodeByteArray(data, 0, data.length);
+                Log.d(TAG, "originPic size: Height "+ originPic.getHeight() + ",Width "+originPic.getWidth());
+                Bitmap pic = resizeImg(originPic, 420, 270);
+                Log.d(TAG, "newPic size: Height "+ pic.getHeight() + ",Width "+pic.getWidth());
+                pic.compress(Bitmap.CompressFormat.PNG, 100, fos);
                 fos.close();
-                String filepath = pictureFile.getAbsolutePath();
-                Bitmap pic = BitmapFactory.decodeFile(filepath);
+//                String filepath = pictureFile.getAbsolutePath();
+//                Bitmap pic = BitmapFactory.decodeFile(filepath);
                 mipmap[Index.getAvailableIndex()].setImageBitmap(pic);
                 sensorData[Index.getAvailableIndex()] = (float)sensorUtil.getLastGyroRotate();
                 refPicture[Index.getAvailableIndex()] = pictureFile;
