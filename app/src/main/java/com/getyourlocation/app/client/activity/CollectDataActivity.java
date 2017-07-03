@@ -52,6 +52,8 @@ public class CollectDataActivity extends AppCompatActivity {
     private int seconds = 0;
     private int frameCnt = 1;
 
+    private boolean initCam = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +70,9 @@ public class CollectDataActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         sensorUtil.register();
+        if (initCam == false) {
+            initCamera();
+        }
     }
 
     @Override
@@ -75,6 +80,8 @@ public class CollectDataActivity extends AppCompatActivity {
         super.onPause();
         sensorUtil.unregister();
         releaseCamera();
+        FrameLayout layout = (FrameLayout) findViewById(R.id.data_preview_layout);
+        layout.removeAllViews();
     }
 
     private void releaseCamera(){
@@ -82,6 +89,7 @@ public class CollectDataActivity extends AppCompatActivity {
             camera.setPreviewCallback(null);
             camera.release();
             camera = null;
+            initCam = false;
         }
     }
 
@@ -118,6 +126,7 @@ public class CollectDataActivity extends AppCompatActivity {
         });
         FrameLayout layout = (FrameLayout) findViewById(R.id.data_preview_layout);
         layout.addView(cameraPreview);
+        initCam = true;
     }
 
     private void initMapDialog() {

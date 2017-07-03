@@ -65,6 +65,7 @@ public class PhotoActivity extends AppCompatActivity {
     private int imgUpload;
     private float[] userLocation = new float[2];
     private boolean isView = true;
+    private boolean initCam = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +169,9 @@ public class PhotoActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         sensorUtil.register();
+        if (initCam == false) {
+           initCamera();
+        }
     }
 
     @Override
@@ -175,6 +179,8 @@ public class PhotoActivity extends AppCompatActivity {
         super.onPause();
         sensorUtil.unregister();
         releaseCamera();
+        FrameLayout layout = (FrameLayout) findViewById(R.id.mypreviewlayout);
+        layout.removeAllViewsInLayout();
     }
 
     @Override
@@ -190,6 +196,7 @@ public class PhotoActivity extends AppCompatActivity {
             camera.setPreviewCallback(null);
             camera.release();
             camera = null;
+            initCam = false;
         }
     }
     private void initSensor() {
@@ -201,14 +208,10 @@ public class PhotoActivity extends AppCompatActivity {
 
     private void initCamera() {
         camera = Camera.open();
-        cameraPreview = new CameraPreview(this, camera, new Camera.PreviewCallback() {
-            @Override
-            public void onPreviewFrame(byte[] data, Camera camera) {
-
-            }
-        });
+        cameraPreview = new CameraPreview(this,camera,null);
         FrameLayout layout = (FrameLayout) findViewById(R.id.mypreviewlayout);
         layout.addView(cameraPreview);
+        initCam = true;
     }
 
     private void initCaptureBtn() {
@@ -263,9 +266,11 @@ public class PhotoActivity extends AppCompatActivity {
 //                fos.write(data);
                 Bitmap originPic = BitmapFactory.decodeByteArray(data, 0, data.length);
                 Log.d(TAG, "originPic size: Height "+ originPic.getHeight() + ",Width "+originPic.getWidth());
+                System.out.println( "originPic size: Height "+ originPic.getHeight() + ",Width "+originPic.getWidth());
                 Bitmap pic = resizeImg(originPic, 420, 270);
                 Log.d(TAG, "newPic size: Height "+ pic.getHeight() + ",Width "+pic.getWidth());
-                pic.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                System.out.println( "newPic size: Height "+ pic.getHeight() + ",Width "+pic.getWidth());
+                pic.compress(Bitmap.CompressFormat.JPEG, 100, fos);
                 fos.close();
 //                String filepath = pictureFile.getAbsolutePath();
 //                Bitmap pic = BitmapFactory.decodeFile(filepath);
@@ -273,6 +278,7 @@ public class PhotoActivity extends AppCompatActivity {
                 sensorData[Index.getAvailableIndex()] = (float)sensorUtil.getLastGyroRotate();
                 refPicture[Index.getAvailableIndex()] = pictureFile;
                 uploadImage(refPicture[Index.getAvailableIndex()].getAbsolutePath());
+                System.out.println( "upload file:"+refPicture[Index.getAvailableIndex()].getAbsolutePath());
                 camera.startPreview();
                 isView = true;
 
