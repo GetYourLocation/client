@@ -27,6 +27,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         this.camera = camera;
         this.previewCallback = previewCallback;
         getHolder().addCallback(this);
+        getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
     public Camera.Size getPreviewSize() {
