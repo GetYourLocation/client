@@ -64,6 +64,7 @@ public class PhotoActivity extends AppCompatActivity {
     private int imgCaptured;
     private int imgUpload;
     private float[] userLocation = new float[2];
+    private boolean isView = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +177,14 @@ public class PhotoActivity extends AppCompatActivity {
         releaseCamera();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        sensorUtil.unregister();
+        releaseCamera();
+    }
+
+
     private void releaseCamera(){
         if (camera != null){
             camera.setPreviewCallback(null);
@@ -207,8 +216,11 @@ public class PhotoActivity extends AppCompatActivity {
         captureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Index.Available()) {
-                    camera.takePicture(null, null, pictureCallBack);
+                if (isView == true) {
+                    if (Index.Available()) {
+                        isView = false;
+                        camera.takePicture(null, null, pictureCallBack);
+                    }
                 }
             }
         });
@@ -243,10 +255,10 @@ public class PhotoActivity extends AppCompatActivity {
             if (pictureFile == null){
                 Log.d(TAG, "Error creating media file, check storage permissions: " );
                 camera.startPreview();
+                isView = true;
                 return;
             }
             try {
-                camera.startPreview();
                 FileOutputStream fos = new FileOutputStream(pictureFile);
 //                fos.write(data);
                 Bitmap originPic = BitmapFactory.decodeByteArray(data, 0, data.length);
@@ -261,6 +273,8 @@ public class PhotoActivity extends AppCompatActivity {
                 sensorData[Index.getAvailableIndex()] = (float)sensorUtil.getLastGyroRotate();
                 refPicture[Index.getAvailableIndex()] = pictureFile;
                 uploadImage(refPicture[Index.getAvailableIndex()].getAbsolutePath());
+                camera.startPreview();
+                isView = true;
 
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "File not found: " + e.getMessage());
