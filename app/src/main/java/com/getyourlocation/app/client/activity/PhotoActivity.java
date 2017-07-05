@@ -13,8 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -45,7 +46,8 @@ import java.util.Map;
 public class PhotoActivity extends AppCompatActivity {
     private static final String TAG = "PhotoActivity";
     public final static int RES_POSITION = 1;
-
+    private final int resizeWidth = 228;
+    private final int resizeHeight = 128;
     private SensorUtil sensorUtil;
     private NetworkUtil networkUtil;
 
@@ -66,7 +68,7 @@ public class PhotoActivity extends AppCompatActivity {
     private float[] userLocation = new float[2];
     private boolean isView = true;
     private boolean initCam = false;
-    private int zoomValue = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +77,6 @@ public class PhotoActivity extends AppCompatActivity {
         initData();
         initNetwork();
         initMipmap();
-        initCancelBtn();
         initSensor();
         initCamera();
         initCaptureBtn();
@@ -122,61 +123,60 @@ public class PhotoActivity extends AppCompatActivity {
     }
     private void initMipmap(){
         mipmap[0] =(ImageView) findViewById(R.id.mipmap1);
-        mipmap[0].setImageResource(R.mipmap.ic_launcher_round);
-        mipmap[0].setVisibility(View.VISIBLE);
+        mipmap[0].setVisibility(View.INVISIBLE);
+        mipmap[0].setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ImageView mipmap1 = (ImageView) findViewById(R.id.mipmap1);
+                mipmap1.setVisibility(View.INVISIBLE);
+                Index.resetIndex(0);
+                return true;
+            }
+        });
         mipmap[1] =(ImageView) findViewById(R.id.mipmap2);
-        mipmap[1].setImageResource(R.mipmap.ic_launcher_round);
-        mipmap[1].setVisibility(View.VISIBLE);
+        mipmap[1].setVisibility(View.INVISIBLE);
+        mipmap[1].setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ImageView mipmap2 = (ImageView) findViewById(R.id.mipmap2);
+                mipmap2.setVisibility(View.INVISIBLE);
+                Index.resetIndex(1);
+                return true;
+            }
+        });
         mipmap[2] =(ImageView) findViewById(R.id.mipmap3);
-        mipmap[2].setImageResource(R.mipmap.ic_launcher_round);
-        mipmap[2].setVisibility(View.VISIBLE);
+        mipmap[2].setVisibility(View.INVISIBLE);
+        mipmap[2].setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ImageView mipmap3 = (ImageView) findViewById(R.id.mipmap3);
+                mipmap3.setVisibility(View.INVISIBLE);
+                Index.resetIndex(2);
+                return true;
+            }
+        });
     }
     private void initZoomBtn() {
-        final Button zoomIn = (Button) findViewById(R.id.button_zoomIn);
-        zoomIn.setOnClickListener(new View.OnClickListener() {
+        SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar_zoom);
+        seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+
+
             @Override
-            public void onClick(View v) {
-                if (zoomValue <= 100)
-                setZoom(5);
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                setSeekBarZoom(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
-        Button zoomOut = (Button) findViewById(R.id.button_zoomOut);
-        zoomOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (zoomValue >= 0)
-                setZoom(-5);
-            }
-        });
-    }
-    private void initCancelBtn(){
-        ImageButton cancelBtn1 = (ImageButton) findViewById(R.id.cancel_1);
-            cancelBtn1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ImageView mipmap1 = (ImageView) findViewById(R.id.mipmap1);
-                mipmap1.setImageResource(R.mipmap.ic_launcher_round);
-                Index.resetIndex(0);
-            }
-        });
-        ImageButton cancelBtn2 = (ImageButton) findViewById(R.id.cancel_2);
-        cancelBtn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ImageView mipmap2 = (ImageView) findViewById(R.id.mipmap2);
-                mipmap2.setImageResource(R.mipmap.ic_launcher_round);
-                Index.resetIndex(1);
-            }
-        });
-        ImageButton cancelBtn3 = (ImageButton) findViewById(R.id.cancel_3);
-        cancelBtn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ImageView mipmap3 = (ImageView) findViewById(R.id.mipmap3);
-                mipmap3.setImageResource(R.mipmap.ic_launcher_round);
-                Index.resetIndex(2);
-            }
-        });
+
     }
 
     private void initNetwork() {
@@ -285,7 +285,7 @@ public class PhotoActivity extends AppCompatActivity {
                 Bitmap originPic = BitmapFactory.decodeByteArray(data, 0, data.length);
                 Log.d(TAG, "originPic size: Height "+ originPic.getHeight() + ",Width "+originPic.getWidth());
                 System.out.println( "originPic size: Height "+ originPic.getHeight() + ",Width "+originPic.getWidth());
-                Bitmap pic = resizeImg(originPic, 420, 270);
+                Bitmap pic = resizeImg(originPic, resizeWidth, resizeHeight);
                 Log.d(TAG, "newPic size: Height "+ pic.getHeight() + ",Width "+pic.getWidth());
                 System.out.println( "newPic size: Height "+ pic.getHeight() + ",Width "+pic.getWidth());
                 pic.compress(Bitmap.CompressFormat.JPEG, 100, fos);
@@ -293,6 +293,7 @@ public class PhotoActivity extends AppCompatActivity {
 //                String filepath = pictureFile.getAbsolutePath();
 //                Bitmap pic = BitmapFactory.decodeFile(filepath);
                 mipmap[Index.getAvailableIndex()].setImageBitmap(pic);
+                mipmap[Index.getAvailableIndex()].setVisibility(View.VISIBLE);
                 sensorData[Index.getAvailableIndex()] = (float)sensorUtil.getLastGyroRotate();
                 refPicture[Index.getAvailableIndex()] = pictureFile;
                 uploadImage(refPicture[Index.getAvailableIndex()].getAbsolutePath());
@@ -307,11 +308,10 @@ public class PhotoActivity extends AppCompatActivity {
             }
         }
     };
-    public void setZoom(int value){
+    public void setSeekBarZoom(int value){
         try{
             Camera.Parameters params = camera.getParameters();
-            zoomValue += value;
-            params.setZoom(zoomValue);
+            params.setZoom(value);
             camera.setParameters(params);
             Log.d(TAG, "Is support Zoom " + params.isZoomSupported());
         }catch (Exception e) {

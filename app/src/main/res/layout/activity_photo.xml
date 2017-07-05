@@ -6,85 +6,6 @@
     android:baselineAligned="false"
     android:weightSum="1.0">
 
-    <LinearLayout
-        android:id="@+id/bitmaplayout"
-        android:layout_width="105dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <FrameLayout
-            android:id="@+id/image1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.33">
-
-            <ImageView
-                android:id="@+id/mipmap1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerInside"
-                android:visibility="invisible"
-                app:srcCompat="@mipmap/ic_launcher" />
-
-            <ImageButton
-                android:id="@+id/cancel_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:background="?attr/selectableItemBackground"
-                app:srcCompat="@android:drawable/ic_delete" />
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/image2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.33">
-
-            <ImageView
-                android:id="@+id/mipmap2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerInside"
-                android:visibility="invisible"
-                app:srcCompat="@mipmap/ic_launcher" />
-
-            <ImageButton
-                android:id="@+id/cancel_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:background="@android:drawable/list_selector_background"
-                app:srcCompat="@android:drawable/ic_delete" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/image3"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.33">
-
-            <ImageView
-                android:id="@+id/mipmap3"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerInside"
-                android:visibility="invisible"
-                app:srcCompat="@mipmap/ic_launcher" />
-
-            <ImageButton
-                android:id="@+id/cancel_3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:background="@android:drawable/list_selector_background"
-                app:srcCompat="@android:drawable/ic_delete" />
-
-        </FrameLayout>
-
-    </LinearLayout>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -94,7 +15,66 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+
         </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/bitmaplayout"
+            android:layout_width="105dp"
+            android:layout_height="match_parent"
+            android:background="#88000000"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/image1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33"
+                android:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/mipmap1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerInside"
+                    android:visibility="visible"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/image2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33">
+
+                <ImageView
+                    android:id="@+id/mipmap2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerInside"
+                    android:visibility="visible"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/image3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.33">
+
+                <ImageView
+                    android:id="@+id/mipmap3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerInside"
+                    android:visibility="visible"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+            </FrameLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/buttonlayout"
@@ -108,21 +88,6 @@
             android:visibility="visible"
             android:weightSum="1">
 
-            <Button
-                android:id="@+id/button_zoomIn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:textSize="18sp"
-                android:text="放大" />
-
-            <Button
-                android:id="@+id/button_zoomOut"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:textSize="18sp"
-                android:text="缩小" />
 
             <Button
                 android:id="@+id/button_shoot"
@@ -144,6 +109,18 @@
 
 
         </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/seekBar_zoom"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="40dp"
+            android:layout_weight="1"
+            android:max="100"
+            android:layout_alignStart="@+id/buttonlayout" />
+
+
     </RelativeLayout>
 
 </LinearLayout>

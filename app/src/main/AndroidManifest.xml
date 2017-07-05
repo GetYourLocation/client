@@ -51,7 +51,6 @@
             android:name="com.getyourlocation.app.client.activity.PhotoActivity"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateAlwaysHidden" />
-        <activity android:name=".activity.testActivity" />
     </application>
 
 </manifest>
