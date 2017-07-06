@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -54,6 +55,7 @@ public class PhotoActivity extends AppCompatActivity {
     private Camera camera;
     private CameraPreview cameraPreview;
     private ImageView[] mipmap = new ImageView[3];
+    private TextView[] mipmap_info = new TextView[3];
     private Button captureBtn;
     private Button PositionBtn;
 
@@ -68,6 +70,13 @@ public class PhotoActivity extends AppCompatActivity {
     private float[] userLocation = new float[2];
     private boolean isView = true;
     private boolean initCam = false;
+    private boolean isHelpShowed = false;
+    private boolean finishUpload = true;
+    private String Hint_start = "从右向左旋转手机拍照\n" +
+            "旋转过程中传感器会记录旋转角度\n"+
+            "拍满三张可以提交并定位\n" +
+            "长按图片可取消已拍图片并按顺序重拍\n"
+            ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +91,7 @@ public class PhotoActivity extends AppCompatActivity {
         initCaptureBtn();
         initPositionBtn();
         initZoomBtn();
+        initHelpBtn();
     }
 
     private void returnResult() {
@@ -121,7 +131,28 @@ public class PhotoActivity extends AppCompatActivity {
             }
         });
     }
+    private void initHelpBtn(){
+        final Button helpBtn = (Button) findViewById(R.id.button_help);
+        final TextView helpText = (TextView) findViewById(R.id.infomation_help);
+        helpText.setText(Hint_start);
+        helpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isHelpShowed == false) {
+                    isHelpShowed = true;
+                    helpText.setVisibility(View.VISIBLE);
+                    helpBtn.setText("取消帮助");
+                } else {
+                    isHelpShowed = false;
+                    helpText.setVisibility(View.INVISIBLE);
+                    helpBtn.setText("帮助");
+                }
+            }
+        });
+    }
     private void initMipmap(){
+        mipmap_info[0] = (TextView)findViewById(R.id.mipmap1_info);
+        mipmap_info[0].setVisibility(View.INVISIBLE);
         mipmap[0] =(ImageView) findViewById(R.id.mipmap1);
         mipmap[0].setVisibility(View.INVISIBLE);
         mipmap[0].setOnLongClickListener(new View.OnLongClickListener() {
@@ -129,10 +160,14 @@ public class PhotoActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 ImageView mipmap1 = (ImageView) findViewById(R.id.mipmap1);
                 mipmap1.setVisibility(View.INVISIBLE);
+                mipmap_info[0].setVisibility(View.INVISIBLE);
                 Index.resetIndex(0);
                 return true;
             }
         });
+
+        mipmap_info[1] = (TextView)findViewById(R.id.mipmap2_info);
+        mipmap_info[1].setVisibility(View.INVISIBLE);
         mipmap[1] =(ImageView) findViewById(R.id.mipmap2);
         mipmap[1].setVisibility(View.INVISIBLE);
         mipmap[1].setOnLongClickListener(new View.OnLongClickListener() {
@@ -140,21 +175,28 @@ public class PhotoActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 ImageView mipmap2 = (ImageView) findViewById(R.id.mipmap2);
                 mipmap2.setVisibility(View.INVISIBLE);
+                mipmap_info[1].setVisibility(View.INVISIBLE);
                 Index.resetIndex(1);
                 return true;
             }
         });
+
+        mipmap_info[2] = (TextView)findViewById(R.id.mipmap3_info);
+        mipmap_info[2].setVisibility(View.INVISIBLE);
         mipmap[2] =(ImageView) findViewById(R.id.mipmap3);
         mipmap[2].setVisibility(View.INVISIBLE);
+
         mipmap[2].setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 ImageView mipmap3 = (ImageView) findViewById(R.id.mipmap3);
                 mipmap3.setVisibility(View.INVISIBLE);
+                mipmap_info[2].setVisibility(View.INVISIBLE);
                 Index.resetIndex(2);
                 return true;
             }
         });
+
     }
     private void initZoomBtn() {
         SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar_zoom);
@@ -238,9 +280,12 @@ public class PhotoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isView == true) {
-                    if (Index.Available()) {
-                        isView = false;
-                        camera.takePicture(null, null, pictureCallBack);
+                    if (finishUpload == true) {
+                        if (Index.Available() ) {
+                            finishUpload = false;
+                            isView = false;
+                            camera.takePicture(null, null, pictureCallBack);
+                        }
                     }
                 }
             }
@@ -281,17 +326,14 @@ public class PhotoActivity extends AppCompatActivity {
             }
             try {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
-//                fos.write(data);
                 Bitmap originPic = BitmapFactory.decodeByteArray(data, 0, data.length);
-                Log.d(TAG, "originPic size: Height "+ originPic.getHeight() + ",Width "+originPic.getWidth());
-                System.out.println( "originPic size: Height "+ originPic.getHeight() + ",Width "+originPic.getWidth());
+//                Log.d(TAG, "originPic size: Height "+ originPic.getHeight() + ",Width "+originPic.getWidth());
+//                System.out.println( "originPic size: Height "+ originPic.getHeight() + ",Width "+originPic.getWidth());
                 Bitmap pic = resizeImg(originPic, resizeWidth, resizeHeight);
-                Log.d(TAG, "newPic size: Height "+ pic.getHeight() + ",Width "+pic.getWidth());
-                System.out.println( "newPic size: Height "+ pic.getHeight() + ",Width "+pic.getWidth());
+//                Log.d(TAG, "newPic size: Height "+ pic.getHeight() + ",Width "+pic.getWidth());
+//                System.out.println( "newPic size: Height "+ pic.getHeight() + ",Width "+pic.getWidth());
                 pic.compress(Bitmap.CompressFormat.JPEG, 100, fos);
                 fos.close();
-//                String filepath = pictureFile.getAbsolutePath();
-//                Bitmap pic = BitmapFactory.decodeFile(filepath);
                 mipmap[Index.getAvailableIndex()].setImageBitmap(pic);
                 mipmap[Index.getAvailableIndex()].setVisibility(View.VISIBLE);
                 sensorData[Index.getAvailableIndex()] = (float)sensorUtil.getLastGyroRotate();
@@ -378,7 +420,7 @@ public class PhotoActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, response);
-                        CommonUtil.showToast(PhotoActivity.this, "Upload succeed!");
+                    //    CommonUtil.showToast(PhotoActivity.this, "Upload succeed!");
                         try {
                             JSONObject jsonObj = new JSONObject(response);
                             int i = Index.getAvailableIndex();
@@ -388,17 +430,23 @@ public class PhotoActivity extends AppCompatActivity {
                             imgLocation[i][1] =  (float)y;
                             imgUploadStatus[i] = true;
                             imgUpload++;
-                            CommonUtil.showToast(PhotoActivity.this, imgFilename+":location is x:"+imgLocation[i][0]+" y:"+imgLocation[i][1]);
-                            CommonUtil.showToast(PhotoActivity.this, "Angle is "+ sensorData[Index.getAvailableIndex()]);
+                            String loc_info = String.format("%d,%d",(int)imgLocation[i][0],(int)imgLocation[i][1] );
+                            mipmap_info[i].setText(loc_info);
+                            mipmap_info[i].setVisibility(View.VISIBLE);
+                            CommonUtil.showToast(PhotoActivity.this, "目前相对旋转角度为："+ sensorData[Index.getAvailableIndex()]);
+                            finishUpload = true;
                         } catch (Exception e) {
                             Log.e(TAG, "", e);
+                            finishUpload = true;
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "", error);
-                CommonUtil.showToast(PhotoActivity.this, "Upload failed! Code:" + error.networkResponse.statusCode);
+                CommonUtil.showToast(PhotoActivity.this, "上传失败，请检查您的网络设置，错误代码：" + error.networkResponse.statusCode);
+//                CommonUtil.showToast(PhotoActivity.this, "Upload failed! Code:" + error.networkResponse.statusCode);
+                finishUpload = true;
             }
         });
         req.addFile("img", imgFilename);
@@ -419,15 +467,16 @@ public class PhotoActivity extends AppCompatActivity {
                             double y = ((Number)jsonObj.get("y")).doubleValue();
                             userLocation[0] = (float)x;
                             userLocation[1] = (float)y;
-                            // uncompleted api test
-                            userLocation[0] = (float)100;
-                            userLocation[1] = (float)120;
+//                            // uncompleted api test
+//                            userLocation[0] = (float)100;
+//                            userLocation[1] = (float)120;
                             Log.d(TAG,  "x:" + x + ",y:" + y);
                             CommonUtil.showToast(PhotoActivity.this, "x:" + x + ",y:" + y);
                           //  Thread.currentThread().sleep(5000);
                             returnResult();
                         } catch (Exception e) {
                             Log.e(TAG, "", e);
+                            CommonUtil.showToast(PhotoActivity.this, "提交失败，请检查您的网络");
                         }
                     }
                 }, new Response.ErrorListener() {

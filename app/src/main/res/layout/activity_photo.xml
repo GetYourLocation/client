@@ -37,8 +37,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerInside"
-                    android:visibility="visible"
-                    app:srcCompat="@mipmap/ic_launcher" />
+                    android:visibility="visible"/>
+                <TextView
+                    android:textColor="@color/white"
+                    android:id="@+id/mipmap1_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:layout_gravity="bottom" />
 
             </FrameLayout>
 
@@ -53,8 +59,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerInside"
-                    android:visibility="visible"
-                    app:srcCompat="@mipmap/ic_launcher" />
+                    android:visibility="visible"/>
+                <TextView
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:id="@+id/mipmap2_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom" />
 
             </FrameLayout>
 
@@ -69,8 +81,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerInside"
-                    android:visibility="visible"
-                    app:srcCompat="@mipmap/ic_launcher" />
+                    android:visibility="visible"/>
+                <TextView
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:id="@+id/mipmap3_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"/>
 
             </FrameLayout>
 
@@ -90,23 +108,31 @@
 
 
             <Button
+                android:id="@+id/button_upload"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:text="上传"
+                android:textSize="18sp"
+                android:visibility="visible" />
+
+            <Button
                 android:id="@+id/button_shoot"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
+
                 android:text="拍摄"
                 android:textSize="18sp"
                 android:visibility="visible" />
 
             <Button
-                android:id="@+id/button_upload"
+                android:id="@+id/button_help"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:text="上传"
+
+                android:text="帮助"
                 android:textSize="18sp"
                 android:visibility="visible" />
-
 
         </LinearLayout>
 
@@ -120,6 +146,16 @@
             android:max="100"
             android:layout_alignStart="@+id/buttonlayout" />
 
+        <TextView
+            android:visibility="invisible"
+            android:id="@+id/infomation_help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:background="#90000000"
+            android:text="help infomation"
+            android:textColor="@color/white"
+            android:layout_alignTop="@+id/seekBar_zoom" />
 
     </RelativeLayout>
 
