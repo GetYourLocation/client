@@ -125,7 +125,7 @@ public class PhotoActivity extends AppCompatActivity {
                     float x3 = imgLocation[2][0];
                     float y3 = imgLocation[2][1];
 //                   a test example
-                    alpha = 45; beta = 45;x1 =-1;y1=0;x2=0;y2=-1;x3=1;y3=0;
+//                    alpha = 45; beta = 45;x1 =-1;y1=0;x2=0;y2=-1;x3=1;y3=0;
                     TrianglePosition(alpha, beta, x1, y1, x2, y2, x3, y3);
                 }
             }
